@@ -17,10 +17,10 @@ Currently there is only support for maven. PRs are welcome!
 - `jack debug` Compiles the project, runs it and attaches a debugger
 - `jack default-class` Print the default class name
 
-## The tools you want to use need to be installed and avaliable in PATH.
+## The tools you want to use need to be installed and avaliable in PATH
 
-### Mac
+You can install them from the websites or using your package manager
 
-```
-brew install maven
-```
+- java ([Oracle JDK](https://www.oracle.com/de/java/technologies/downloads/)/[OpenJDK](https://openjdk.org/)/[Amazon Corretto](https://aws.amazon.com/de/corretto/?filtered-posts.sort-by=item.additionalFields.createdDate&filtered-posts.sort-order=desc)/…)
+- [jdb](https://docs.oracle.com/en/java/javase/11/tools/jdb.html)
+- [maven](https://maven.apache.org/)
