@@ -20,6 +20,7 @@ public class Error {
   /** Format the given messages into a single string with a border around it. */
   private static String prettyPrint(final String... messages) {
     final StringBuilder sb = new StringBuilder();
+    sb.append('\n');
     var longestLine = 4;
     for (final String message : messages) {
       for (final String line : message.split("\n")) {
