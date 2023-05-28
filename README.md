@@ -1,9 +1,9 @@
 <p align="center">
   <img
-    width="25px"
-    height="35px"
+    width="250px"
+    height="350px"
     alt="Jack"
-    src="https://raw.githubusercontent.com/Frank-Mayer/jack/main/jack.svg">
+    src="https://raw.githubusercontent.com/Frank-Mayer/jack/main/Jack.svg">
 </p>
 
 Unified wrapper for common Java utils
