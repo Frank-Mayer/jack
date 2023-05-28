@@ -112,9 +112,17 @@ build/
 
   public abstract void run(final String className);
 
+  public abstract void run(final String[] args);
+
+  public  abstract void run(final String className, final String[] args);
+
   public abstract void debug();
 
   public abstract void debug(final String className);
+
+  public  abstract void debug(final String[] args);
+
+  public  abstract void debug(final String string, final String[] args);
 
   public abstract String getSourcePath();
 }

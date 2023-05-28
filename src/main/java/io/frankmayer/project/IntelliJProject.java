@@ -46,6 +46,18 @@ public class IntelliJProject extends Project {
   }
 
   @Override
+  public void run(String[] args) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'run'");
+  }
+
+  @Override
+  public void run(String className, String[] args) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'run'");
+  }
+
+  @Override
   public void debug() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'debug'");
@@ -53,6 +65,18 @@ public class IntelliJProject extends Project {
 
   @Override
   public void debug(final String className) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'debug'");
+  }
+
+  @Override
+  public void debug(String[] args) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'debug'");
+  }
+
+  @Override
+  public void debug(String string, String[] args) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'debug'");
   }

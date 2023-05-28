@@ -10,7 +10,13 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.StringJoiner;
+import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,6 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 public class MavenProject extends Project {
 
@@ -310,24 +317,44 @@ public class MavenProject extends Project {
 
   @Override
   public Optional<String> getDefaultClassName() {
-    // look for project.build.plugins.plugin with groupId =
-    // org.codehaus.mojo and artifactId = exec-maven-plugin in this.document
+    // look for project.build.plugins.plugin
+    // groupId = org.codehaus.mojo
+    // and artifactId = exec-maven-plugin in this.document
     final var plugins = this.document.getElementsByTagName("plugin");
-    for (var i = 0; i < plugins.getLength(); i++) {
+    for (var i = 0; i < plugins.getLength(); ++i) {
       try {
         final var plugin = plugins.item(i);
-        final var groupId = plugin.getChildNodes().item(0).getTextContent();
-        final var artifactId = plugin.getChildNodes().item(1).getTextContent();
-        if (groupId.equals("org.codehaus.mojo") && artifactId.equals("exec-maven-plugin")) {
-          // look for configuration -> mainClass
-          final var configuration = plugin.getChildNodes().item(2);
-          final var mainClass = configuration.getChildNodes().item(0).getTextContent();
-          return Optional.of(mainClass);
+        final var children = plugin.getChildNodes();
+        Node configurationEl = null;
+        for (var j = 0; j < children.getLength(); ++j) {
+          final var el = children.item(j);
+          if (el.getNodeName().equals("groupId")
+              && !el.getTextContent().equals("org.codehaus.mojo")) {
+            continue;
+          }
+          if (el.getNodeName().equals("artifactId")
+              && !el.getTextContent().equals("exec-maven-plugin")) {
+            continue;
+          }
+          if (el.getNodeName().equals("configuration")) {
+            configurationEl = el;
+          }
+        }
+        if (configurationEl == null) {
+          continue;
+        }
+        final var configElChildren = configurationEl.getChildNodes();
+        for (var j = 0; j < configElChildren.getLength(); ++j) {
+          final var el = configElChildren.item(j);
+          if (el.getNodeName().equals("mainClass")) {
+            return Optional.of(el.getTextContent());
+          }
         }
       } catch (final Exception e) {
         continue;
       }
     }
+
     return Optional.empty();
   }
 
@@ -369,24 +396,29 @@ public class MavenProject extends Project {
 
   @Override
   public void run() {
-    final var processBuilder =
-        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile", "exec:java");
-    processBuilder.directory(this.projectFile.getParentFile());
-    processBuilder.inheritIO();
-    try {
-      final var process = processBuilder.start();
-      process.waitFor();
-      final var exitCode = process.exitValue();
-      if (exitCode != 0) {
-        panic("Run failed with exit code " + exitCode);
-      }
-    } catch (final Exception e) {
-      panic(e);
+    final var entryPoint = this.getDefaultClassName();
+    if (entryPoint.isEmpty()) {
+      panic("No entry point found");
     }
+    this.run(entryPoint.get());
   }
 
   @Override
   public void run(final String className) {
+    this.run(className, new String[] {});
+  }
+
+  @Override
+  public void run(final String[] args) {
+    final var entryPoint = this.getDefaultClassName();
+    if (entryPoint.isEmpty()) {
+      panic("No entry point found");
+    }
+    this.run(entryPoint.get(), args);
+  }
+
+  @Override
+  public void run(final String className, final String[] args) {
     final var processBuilder =
         new ProcessBuilder(
             "mvn",
@@ -394,7 +426,8 @@ public class MavenProject extends Project {
             this.projectFile.toString(),
             "compile",
             "exec:java",
-            "-Dexec.mainClass=" + className);
+            "-Dexec.mainClass=\"" + className + "\"",
+            "-Dexec.args='" + String.join("' '", args) + "'");
     processBuilder.directory(this.projectFile.getParentFile());
     processBuilder.inheritIO();
     try {
@@ -420,6 +453,20 @@ public class MavenProject extends Project {
 
   @Override
   public void debug(final String className) {
+    this.debug(className, new String[0]);
+  }
+
+  @Override
+  public void debug(final String[] args) {
+    final var defaultClassName = this.getDefaultClassName();
+    if (!defaultClassName.isPresent()) {
+      panic("No default class name found.");
+    }
+    this.debug(defaultClassName.get(), args);
+  }
+
+  @Override
+  public void debug(final String className, final String[] args) {
     try {
       final int jdbPort = 5005;
 
@@ -440,11 +487,17 @@ public class MavenProject extends Project {
 
       final var appProcessBuilder =
           new ProcessBuilder(
-              "java",
-              "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + jdbPort,
-              "-cp",
-              "target/classes",
-              className);
+              Stream.concat(
+                      Arrays.asList(
+                          "java",
+                          "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address="
+                              + jdbPort,
+                          "-cp",
+                          "target/classes",
+                          className)
+                          .stream(),
+                      Arrays.stream(args))
+                  .toArray(String[]::new));
       appProcessBuilder.directory(this.projectFile.getParentFile());
       final var appProcess = appProcessBuilder.start();
 
@@ -466,9 +519,11 @@ public class MavenProject extends Project {
 
   @Override
   public String getSourcePath() {
-    final var projectRoot = this.projectFile.getParentFile();
-    final var srcDir = new File(projectRoot, Paths.get("src", "main", "java").toString());
-    final var srcDirPath = srcDir.getAbsolutePath();
-    return srcDirPath;
+    // src/main/java
+    final var joiner = new StringJoiner(File.separator);
+    joiner.add("src");
+    joiner.add("main");
+    joiner.add("java");
+    return joiner.toString();
   }
 }

@@ -3,6 +3,7 @@ package io.frankmayer;
 import static io.frankmayer.Error.panic;
 
 import io.frankmayer.project.Project;
+import java.util.Arrays;
 
 public class Main {
 
@@ -73,11 +74,50 @@ public class Main {
             panic(String.format("Unknown command named %s takes one argument.", args[0]));
         }
       default:
-        System.out.println("help: ");
-        System.out.println("  build: Build the project");
-        System.out.println("  run: Run the project");
-        System.out.println("  debug: Debug the project");
-        System.out.println("  default-class: Print the default class name");
+        if (args.length >= 3) {
+          // look for parameter "--"
+          // to separate the command from the arguments
+          int i = 0;
+          for (; i < args.length; i++) {
+            if (args[i].equals("--")) {
+              break;
+            }
+          }
+          final var passArgs = Arrays.stream(args).skip(i + 1).toArray(String[]::new);
+
+          if (i == 1) {
+            switch (args[0]) {
+              case "run":
+                proj.ifPresent(x -> x.run(passArgs));
+                return;
+              case "debug":
+                proj.ifPresent(x -> x.debug(passArgs));
+                return;
+              default:
+                panic(String.format("No command named %s takes arguments.", args[0]));
+            }
+          } else if (i == 2) {
+            switch (args[0]) {
+              case "run":
+                proj.ifPresent(x -> x.run(args[1], passArgs));
+                return;
+              case "debug":
+                proj.ifPresent(x -> x.debug(args[1], passArgs));
+                return;
+              default:
+                panic(String.format("No command named %s takes arguments.", args[0]));
+            }
+          }
+        }
     }
+    System.out.println("help: ");
+    System.out.println("  init <project type>: Create a new project");
+    System.out.println("  build: Build the project");
+    System.out.println("  clean: Clean the project");
+    System.out.println("  rebuild: Clean and build the project");
+    System.out.println("  run: Run the project (default class)");
+    System.out.println("  run <entry point>: Run the project at the given entry point");
+    System.out.println("  debug: Debug the project");
+    System.out.println("  default-class: Print the default class name");
   }
 }
