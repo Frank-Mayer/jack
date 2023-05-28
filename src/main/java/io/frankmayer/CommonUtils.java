@@ -56,5 +56,59 @@ public class CommonUtils {
     return CommonUtils.projectCache;
   }
 
+  /**
+   * Tries to get the current terminal width.
+   *
+   * @return The current terminal width. -1 if it could not be determined.
+   */
+  public static int getTerminalWidth() {
+    // try env variable COLUMNS
+    final var terminalWidth = System.getenv("COLUMNS");
+    if (terminalWidth != null) {
+      return Integer.parseInt(terminalWidth);
+    }
+
+    // try stty
+    try {
+      final var sttyProcess = new ProcessBuilder("stty", "size").start();
+      final var sttyOutput = new java.io.BufferedReader(new java.io.InputStreamReader(sttyProcess.getInputStream()));
+      final var sttyDimensions = sttyOutput.readLine().split(" ");
+      return Integer.parseInt(sttyDimensions[1]);
+    } catch (final Exception e) {
+      // ignore
+    }
+
+    return -1;
+  }
+
+  /**
+   * Tries to get the current terminal height.
+   *
+   * @return The current terminal height. -1 if it could not be determined.
+   */
+  public static int getTerminalHeight() {
+    // try env variable LINES
+    final var terminalHeight = System.getenv("LINES");
+    if (terminalHeight != null) {
+      return Integer.parseInt(terminalHeight);
+    }
+
+    // try stty
+    try {
+      final var sttyProcess = new ProcessBuilder("stty", "size").start();
+      final var sttyOutput = new java.io.BufferedReader(new java.io.InputStreamReader(sttyProcess.getInputStream()));
+      final var sttyDimensions = sttyOutput.readLine().split(" ");
+      return Integer.parseInt(sttyDimensions[0]);
+    } catch (final Exception e) {
+      // ignore
+    }
+
+    return -1;
+  }
+
+  public static void setCursorPosition(final int x, final int y) {
+    System.out.print("\033[" + y + ";" + x + "H");
+  }
+
   private CommonUtils() {}
 }
