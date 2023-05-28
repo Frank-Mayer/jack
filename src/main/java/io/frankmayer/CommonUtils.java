@@ -9,6 +9,7 @@ import io.frankmayer.project.Project;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -18,6 +19,18 @@ public class CommonUtils {
   private static Optional<Project> projectCache = Optional.empty();
 
   private static final Scanner scanner = new Scanner(System.in);
+
+  public static String fixJavaPackageName(final String packageName) {
+    return Arrays.stream(packageName.split("\\."))
+        .map(CommonUtils::fixJavaArtifactName)
+        .filter(x -> !x.isEmpty())
+        .reduce((x, y) -> x + "." + y)
+        .orElse("");
+  }
+
+  public static String fixJavaArtifactName(final String artifactName) {
+    return artifactName.replaceAll("[-]+", "_").replaceAll("[^a-zA-Z0-9_]", "").replaceAll("^(?=[0-9])", "_");
+  }
 
   /**
    * Looks for project file like pom.xml or build.gradle in the current directory.

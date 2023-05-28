@@ -64,13 +64,13 @@ public class MavenProject extends Project {
 
     // create groupId element
     final var groupIdElement = pomXmlDocument.createElement("groupId");
-    final var groupId = CommonUtils.askString("groupId");
+    final var groupId = CommonUtils.fixJavaPackageName(CommonUtils.askString("groupId"));
     groupIdElement.setTextContent(groupId);
     projectElement.appendChild(groupIdElement);
 
     // create artifactId element
     final var artifactIdElement = pomXmlDocument.createElement("artifactId");
-    final var artifactId = CommonUtils.askString("artifactId");
+    final var artifactId = CommonUtils.fixJavaArtifactName(CommonUtils.askString("artifactId"));
     artifactIdElement.setTextContent(artifactId);
     projectElement.appendChild(artifactIdElement);
 
