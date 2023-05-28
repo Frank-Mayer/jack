@@ -8,7 +8,13 @@ Currently there is only support for maven. PRs are welcome!
 
 [![Deploy jar file to Pages](https://github.com/Frank-Mayer/jack/actions/workflows/deploy.yml/badge.svg)](https://github.com/Frank-Mayer/jack/actions/workflows/deploy.yml)
 
-[Download the latest `jack.jar` file](https://frank-mayer.github.io/jack/jack.jar)
+## Installation
+
+You can [download the latest `jack.jar` file](https://frank-mayer.github.io/jack/jack.jar) but it is recommended to use the installation script.
+
+```bash
+bash <(curl -s https://raw.githubusercontent.com/Frank-Mayer/jack/main/install.sh)
+```
 
 ## Usage
 
@@ -16,6 +22,8 @@ Currently there is only support for maven. PRs are welcome!
 - `jack run` Compiles the project and runs it
 - `jack debug` Compiles the project, runs it and attaches a debugger
 - `jack default-class` Print the default class name
+
+More detailed information is provided in this [repos wiki](https://github.com/Frank-Mayer/jack/wiki).
 
 ## The tools you want to use need to be installed and avaliable in PATH
 
