@@ -147,7 +147,7 @@ public class CommonUtils {
         case "":
           return defaultValue;
         default:
-          System.out.println("Please answer with yes or no.");
+          System.out.println("Please answer with yes or no");
       }
     }
   }
@@ -164,7 +164,7 @@ public class CommonUtils {
         case "no":
           return false;
         default:
-          System.out.println("Please answer with yes or no.");
+          System.out.println("Please answer with yes or no");
       }
     }
   }
@@ -175,7 +175,7 @@ public class CommonUtils {
       final var javaVersionParts = javaVersion.split("\\.");
       return javaVersionParts[0];
     } catch (final Exception e) {
-      panic("Could not determine Java version.", e);
+      panic("Could not determine Java version", e);
       return null;
     }
   }

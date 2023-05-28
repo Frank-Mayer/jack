@@ -39,7 +39,7 @@ public class Main {
                   if (defaultClassName.isPresent()) {
                     System.out.println(defaultClassName.get());
                   } else {
-                    System.out.println("No default class name found.");
+                    System.out.println("No default class name found");
                   }
                 });
             return;
@@ -48,7 +48,7 @@ public class Main {
             System.out.println("Version 1.0.0");
             return;
           default:
-            panic("Unknown command: " + args[0]);
+            panic(String.format("No command named %s takes no arguments", args[0]));
             return;
         }
       case 2:
@@ -62,7 +62,7 @@ public class Main {
           case "init":
             if (proj.isPresent()) {
               System.out.println("There is already a project here: " + proj.get().getProjectFile());
-              System.out.println("This could lead to problems.");
+              System.out.println("This could lead to problems");
               if (!CommonUtils.confirm("Do you want to continue?", false)) {
                 System.out.println("Aborting");
                 return;
@@ -71,7 +71,7 @@ public class Main {
             Project.create(args[1]);
             return;
           default:
-            panic(String.format("Unknown command named %s takes one argument.", args[0]));
+            panic(String.format("No command named %s takes one argument", args[0]));
         }
       default:
         if (args.length >= 3) {
@@ -94,7 +94,7 @@ public class Main {
                 proj.ifPresent(x -> x.debug(passArgs));
                 return;
               default:
-                panic(String.format("No command named %s takes arguments.", args[0]));
+                panic(String.format("No command named %s takes arguments", args[0]));
             }
           } else if (i == 2) {
             switch (args[0]) {
@@ -105,7 +105,7 @@ public class Main {
                 proj.ifPresent(x -> x.debug(args[1], passArgs));
                 return;
               default:
-                panic(String.format("No command named %s takes arguments.", args[0]));
+                panic(String.format("No command named %s takes arguments", args[0]));
             }
           }
         }

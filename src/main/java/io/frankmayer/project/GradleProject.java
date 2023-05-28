@@ -8,12 +8,12 @@ import java.util.Optional;
 public class GradleProject extends Project {
 
   public static void create() {
-    panic("Gradle is not supported yet.");
+    panic("Gradle is not supported yet");
   }
 
   public GradleProject(final File projectFile) {
     super(projectFile);
-    panic("Gradle is not supported yet.");
+    panic("Gradle is not supported yet");
   }
 
   @Override

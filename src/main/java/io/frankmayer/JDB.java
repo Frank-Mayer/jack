@@ -18,10 +18,10 @@ public class JDB {
       try {
         this.jdbProcess.waitFor();
       } catch (final InterruptedException e) {
-        panic("Error waiting for JDB process.");
+        panic("Error waiting for JDB process");
       }
     } catch (final IOException e) {
-      panic("Error starting JDB process.");
+      panic("Error starting JDB process");
     }
   }
 }

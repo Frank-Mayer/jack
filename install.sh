@@ -46,7 +46,7 @@ chmod +x $HOME/.jack/bin/jack || {
 echo "Done"
 
 command -v jack >/dev/null 2>&1 || {
-  echo "Jack is not on your PATH."
+  echo "Jack is not in your PATH"
   # find default shells rc file
   rcfile="$HOME/.profile"
   case "$SHELL" in

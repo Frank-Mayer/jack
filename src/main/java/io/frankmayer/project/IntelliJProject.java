@@ -8,12 +8,12 @@ import java.util.Optional;
 public class IntelliJProject extends Project {
 
   public static void create() {
-    panic("IntelliJ is not supported yet.");
+    panic("IntelliJ is not supported yet");
   }
 
   public IntelliJProject(final File projectFile) {
     super(projectFile);
-    panic("IntelliJ is not supported yet.");
+    panic("IntelliJ is not supported yet");
   }
 
   @Override

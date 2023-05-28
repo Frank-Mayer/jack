@@ -445,7 +445,7 @@ public class MavenProject extends Project {
   public void debug() {
     final var defaultClassName = this.getDefaultClassName();
     if (!defaultClassName.isPresent()) {
-      panic("No default class name found.");
+      panic("No default class name found");
     }
     this.debug(defaultClassName.get());
   }
@@ -459,7 +459,7 @@ public class MavenProject extends Project {
   public void debug(final String[] args) {
     final var defaultClassName = this.getDefaultClassName();
     if (!defaultClassName.isPresent()) {
-      panic("No default class name found.");
+      panic("No default class name found");
     }
     this.debug(defaultClassName.get(), args);
   }
@@ -503,7 +503,7 @@ public class MavenProject extends Project {
       Thread.sleep(1000);
 
       if (appProcess.isAlive()) {
-        System.out.println("Application is running.");
+        System.out.println("Application is running");
       } else {
         final var exitCode = appProcess.exitValue();
         panic("Application exited with code " + exitCode);
