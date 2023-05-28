@@ -11,10 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
@@ -217,22 +214,24 @@ public class MavenProject extends Project {
 
     // create Main.java file
     final var mainJavaFile = Paths.get(packageDir.toString(), "Main.java").toFile();
-    try {
-      mainJavaFile.createNewFile();
-    } catch (final Exception e) {
-      panic(e);
-    }
+    if (!mainJavaFile.exists()) {
+      try {
+        mainJavaFile.createNewFile();
+      } catch (final Exception e) {
+        panic(e);
+      }
 
-    // write Main.java file
-    try (final var writer = new FileWriter(mainJavaFile)) {
-      writer.write("package " + groupId + ";\n\n");
-      writer.write("public class Main {\n");
-      writer.write("    public static void main(String[] args) {\n");
-      writer.write("        System.out.println(\"Hello World!\");\n");
-      writer.write("    }\n");
-      writer.write("}\n");
-    } catch (final Exception e) {
-      panic(e);
+      // write Main.java file
+      try (final var writer = new FileWriter(mainJavaFile)) {
+        writer.write("package " + groupId + ";\n\n");
+        writer.write("public class Main {\n");
+        writer.write("    public static void main(String[] args) {\n");
+        writer.write("        System.out.println(\"Hello World!\");\n");
+        writer.write("    }\n");
+        writer.write("}\n");
+      } catch (final Exception e) {
+        panic(e);
+      }
     }
 
     // create test directory
