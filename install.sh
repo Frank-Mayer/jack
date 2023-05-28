@@ -2,7 +2,11 @@
 
 echo "Installing jack"
 echo "Creating directory $HOME/.jack/bin"
-mkdir -p $HOME/.jack/bin
+mkdir -p $HOME/.jack/bin || {
+  echo "Failed to create directory $HOME/.jack/bin"
+  echo "Installation failed"
+  exit 1
+}
 echo "Done"
 
 echo "Building jack from source"
@@ -14,7 +18,11 @@ else
     case "$response" in
       [yY][eE][sS]|[yY]) 
         echo "Downloading latest release from GitHub"
-        curl -o $HOME/.jack/bin/jack.jar https://frank-mayer.github.io/jack/jack.jar
+        curl -o $HOME/.jack/bin/jack.jar https://frank-mayer.github.io/jack/jack.jar || {
+          echo "Failed to download latest release from GitHub"
+          echo "Installation failed"
+          exit 1
+        }
         echo "Done"
         ;;
       *)
@@ -30,7 +38,11 @@ cat << 'END_SCRIPT' > $HOME/.jack/bin/jack
 #!/bin/bash
 java -jar $HOME/.jack/bin/jack.jar "$@"
 END_SCRIPT
-chmod +x $HOME/.jack/bin/jack
+chmod +x $HOME/.jack/bin/jack || {
+  echo "Failed to create wrapper script"
+  echo "Installation failed"
+  exit 1
+}
 echo "Done"
 
 command -v jack >/dev/null 2>&1 || {
