@@ -31,9 +31,10 @@ public class Error {
   /** Format the given messages into a single string with a border around it. */
   private static String prettyPrint(final String... messages) {
     var longestLine = 0;
-    final var textBlocks = Arrays.stream(messages)
-      .map(message -> message.replaceAll("\t", "    "))
-      .collect(Collectors.toList());
+    final var textBlocks =
+        Arrays.stream(messages)
+            .map(message -> message.replaceAll("\t", "    "))
+            .collect(Collectors.toList());
     final var sb = new StringBuilder();
     for (final var message : textBlocks) {
       final var lines = message.split("\n");
@@ -43,38 +44,37 @@ public class Error {
         }
       }
     }
-    sb.append("╔");
+    sb.append('╔');
     for (var i = 0; i < longestLine; ++i) {
-      sb.append("═");
+      sb.append('═');
     }
     var blockCount = 0;
     sb.append("╗\n");
     for (final var message : textBlocks) {
       final var lines = message.split("\n");
       for (final var line : lines) {
-        sb.append("║");
+        sb.append('║');
         sb.append(line);
         for (var i = line.length(); i < longestLine; ++i) {
-          sb.append(" ");
+          sb.append(' ');
         }
         sb.append("║\n");
       }
       if (++blockCount < textBlocks.size()) {
-        sb.append("╠");
+        sb.append('╠');
         for (var i = 0; i < longestLine; ++i) {
-          sb.append("═");
+          sb.append('═');
         }
         sb.append("╣\n");
       }
     }
-    sb.append("╚");
+    sb.append('╚');
     for (var i = 0; i < longestLine; ++i) {
-      sb.append("═");
+      sb.append('═');
     }
     sb.append("╝\n");
     return sb.toString();
   }
 
-  private Error() {
-  }
+  private Error() {}
 }

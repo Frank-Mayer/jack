@@ -1,17 +1,23 @@
 package io.frankmayer;
 
-import java.io.File;
-import java.util.Optional;
+import static io.frankmayer.Error.panic;
 
 import io.frankmayer.project.GradleProject;
 import io.frankmayer.project.IntelliJProject;
 import io.frankmayer.project.MavenProject;
 import io.frankmayer.project.Project;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.util.Optional;
+import java.util.Scanner;
 
 public class CommonUtils {
 
   private static Optional<File> projectFileCache = Optional.empty();
   private static Optional<Project> projectCache = Optional.empty();
+
+  private static final Scanner scanner = new Scanner(System.in);
 
   /**
    * Looks for project file like pom.xml or build.gradle in the current directory.
@@ -71,7 +77,8 @@ public class CommonUtils {
     // try stty
     try {
       final var sttyProcess = new ProcessBuilder("stty", "size").start();
-      final var sttyOutput = new java.io.BufferedReader(new java.io.InputStreamReader(sttyProcess.getInputStream()));
+      final var sttyOutput =
+          new BufferedReader(new InputStreamReader(sttyProcess.getInputStream()));
       final var sttyDimensions = sttyOutput.readLine().split(" ");
       return Integer.parseInt(sttyDimensions[1]);
     } catch (final Exception e) {
@@ -96,7 +103,8 @@ public class CommonUtils {
     // try stty
     try {
       final var sttyProcess = new ProcessBuilder("stty", "size").start();
-      final var sttyOutput = new java.io.BufferedReader(new java.io.InputStreamReader(sttyProcess.getInputStream()));
+      final var sttyOutput =
+          new BufferedReader(new InputStreamReader(sttyProcess.getInputStream()));
       final var sttyDimensions = sttyOutput.readLine().split(" ");
       return Integer.parseInt(sttyDimensions[0]);
     } catch (final Exception e) {
@@ -107,7 +115,69 @@ public class CommonUtils {
   }
 
   public static void setCursorPosition(final int x, final int y) {
-    System.out.print("\033[" + y + ";" + x + "H");
+    System.out.print("\033[" + y + ';' + x + 'H');
+  }
+
+  public static String askString(final String string) {
+    System.out.print(string + ": ");
+    return CommonUtils.scanner.nextLine().trim();
+  }
+
+  public static String askString(final String string, final String defaultValue) {
+    System.out.print(string + " [" + defaultValue + "]: ");
+    final var input = CommonUtils.scanner.nextLine().trim();
+    return input.isEmpty() ? defaultValue : input;
+  }
+
+  public static boolean confirm(final String string, final boolean defaultValue) {
+    while (true) {
+      if (defaultValue) {
+        System.out.print(string + " [Y/n]: ");
+      } else {
+        System.out.print(string + " [y/N]: ");
+      }
+      final var input = CommonUtils.scanner.nextLine().trim();
+      switch (input.trim().toLowerCase()) {
+        case "y":
+        case "yes":
+          return true;
+        case "n":
+        case "no":
+          return false;
+        case "":
+          return defaultValue;
+        default:
+          System.out.println("Please answer with yes or no.");
+      }
+    }
+  }
+
+  public static boolean confirm(final String string) {
+    while (true) {
+      System.out.print(string + " [y/n]: ");
+      final var input = CommonUtils.scanner.nextLine().trim();
+      switch (input.trim().toLowerCase()) {
+        case "y":
+        case "yes":
+          return true;
+        case "n":
+        case "no":
+          return false;
+        default:
+          System.out.println("Please answer with yes or no.");
+      }
+    }
+  }
+
+  public static String getJavaMajorVersion() {
+    try {
+      final var javaVersion = System.getProperty("java.version");
+      final var javaVersionParts = javaVersion.split("\\.");
+      return javaVersionParts[0];
+    } catch (final Exception e) {
+      panic("Could not determine Java version.", e);
+      return null;
+    }
   }
 
   private CommonUtils() {}

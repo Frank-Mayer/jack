@@ -2,6 +2,8 @@ package io.frankmayer;
 
 import static io.frankmayer.Error.panic;
 
+import io.frankmayer.project.Project;
+
 public class Main {
 
   public static void main(final String[] args) {
@@ -55,6 +57,17 @@ public class Main {
             return;
           case "debug":
             proj.ifPresent(x -> x.debug(args[1]));
+            return;
+          case "init":
+            if (proj.isPresent()) {
+              System.out.println("There is already a project here: " + proj.get().getProjectFile());
+              System.out.println("This could lead to problems.");
+              if (!CommonUtils.confirm("Do you want to continue?", false)) {
+                System.out.println("Aborting");
+                return;
+              }
+            }
+            Project.create(args[1]);
             return;
           default:
             panic(String.format("Unknown command named %s takes one argument.", args[0]));
