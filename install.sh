@@ -72,3 +72,76 @@ command -v jack >/dev/null 2>&1 || {
 }
 
 echo "Installation complete"
+
+echo "Checking for installed Java utilities"
+function inst {
+  package_manager=$(command -v apt-get || command -v yum || command -v pacman || command -v brew)
+  if [ -z "$package_manager" ]; then
+    echo "Failed to find package manager"
+    echo "Installation of $1 failed"
+    exit 1
+  fi
+  echo "Found package manager $package_manager"
+  case "$package_manager" in
+    */apt-get)
+      sudo apt-get update || {
+        echo "Failed to update package manager"
+        echo "Installation failed"
+        exit 1
+      }
+      sudo apt-get install $1 || {
+        echo "Failed to install $1"
+        echo "Installation failed"
+        exit 1
+      }
+      ;;
+    */yum)
+      sudo yum install $1 || {
+        echo "Failed to install $1"
+        echo "Installation failed"
+        exit 1
+      }
+      ;;
+    */pacman)
+      sudo pacman -S $1 || {
+        echo "Failed to install $1"
+        echo "Installation failed"
+        exit 1
+      }
+      ;;
+    */brew)
+      brew install "$1" || {
+        echo "Failed to install $1"
+        echo "Installation failed"
+        exit 1
+      }
+      ;;
+  esac
+}
+function ask_install {
+  read -r -p "Do you want to install $1? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY]) 
+      echo "Installing $1"
+      inst $1 || {
+        echo "Failed to install $1"
+        echo "Installation failed"
+        exit 1
+      }
+      echo "Done"
+      ;;
+    *)
+      echo "Aborting"
+      ;;
+  esac
+}
+command -v java >/dev/null 2>&1 || {
+  echo "Java is not installed"
+  ask_install java
+  exit 1
+}
+command -v mvn >/dev/null 2>&1 || {
+  echo "Maven is not installed"
+  ask_install maven
+  exit 1
+}
