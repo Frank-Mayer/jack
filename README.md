@@ -10,8 +10,6 @@ Unified wrapper for common Java utils
 
 Currently there is only support for maven. PRs are welcome!
 
-[![Java CI with Maven](https://github.com/Frank-Mayer/jack/actions/workflows/maven.yml/badge.svg)](https://github.com/Frank-Mayer/jack/actions/workflows/maven.yml)
-
 [![Deploy jar file to Pages](https://github.com/Frank-Mayer/jack/actions/workflows/deploy.yml/badge.svg)](https://github.com/Frank-Mayer/jack/actions/workflows/deploy.yml)
 
 ## Documentation
