@@ -59,7 +59,7 @@ public class MavenProject extends Project {
   @Override
   public void build() {
     final var processBuilder =
-        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile");
+        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile", "--quiet");
     processBuilder.directory(this.projectFile.getParentFile());
     processBuilder.inheritIO();
     try {
@@ -73,7 +73,7 @@ public class MavenProject extends Project {
   @Override
   public void clean() {
     final var processBuilder =
-        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "clean");
+        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "clean", "--quiet");
     processBuilder.directory(this.projectFile.getParentFile());
     processBuilder.inheritIO();
     try {
@@ -87,7 +87,7 @@ public class MavenProject extends Project {
   @Override
   public void run() {
     final var processBuilder =
-        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile", "exec:java");
+        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile", "exec:java", "--quiet");
     processBuilder.directory(this.projectFile.getParentFile());
     processBuilder.inheritIO();
     try {
@@ -106,6 +106,7 @@ public class MavenProject extends Project {
             "-f",
             this.projectFile.toString(),
             "compile",
+            "--quiet",
             "exec:java",
             "-Dexec.mainClass=" + className);
     processBuilder.directory(this.projectFile.getParentFile());
@@ -134,7 +135,7 @@ public class MavenProject extends Project {
 
       final var compileProcessBuilder =
           new ProcessBuilder(
-              "mvn", "-f", this.projectFile.toString(), "compile", "-Dmaven.compiler.debug=true");
+              "mvn", "-f", this.projectFile.toString(), "compile", "--quiet", "-Dmaven.compiler.debug=true");
       final var compileProcess = compileProcessBuilder.start();
       try {
         compileProcess.waitFor();

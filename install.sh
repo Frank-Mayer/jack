@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir -p ~/.jack/bin
-if mvn clean package && mv target/jack.jar ~/.jack/bin/; then
+if mvn clean package --quiet && mv target/jack.jar ~/.jack/bin/; then
     echo "Build succeeded."
 else
     echo "Build failed. Downloading latest release from GitHub..."
