@@ -40,6 +40,9 @@ command -v jack >/dev/null 2>&1 || {
   case "$SHELL" in
     */zsh) rcfile="$HOME/.zshrc" ;;
     */bash) rcfile="$HOME/.bashrc" ;;
+    */fish) rcfile="$XDG_CONFIG_HOME/fish/config.fish" ;;
+    */csh) rcfile="$HOME/.cshrc" ;;
+    */dash) rcfile="$HOME/.dashrc" ;;
   esac
 
   read -r -p "Do you want to add jack to PATH in '$rcfile'? [y/N] " response
