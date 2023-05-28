@@ -137,7 +137,6 @@ function ask_install {
 }
 command -v java >/dev/null 2>&1 || {
   echo "Java is not installed"
-  ask_install java
   exit 1
 }
 command -v mvn >/dev/null 2>&1 || {
