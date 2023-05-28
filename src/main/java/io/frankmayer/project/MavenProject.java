@@ -59,12 +59,16 @@ public class MavenProject extends Project {
   @Override
   public void build() {
     final var processBuilder =
-        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile", "--quiet");
+        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile");
     processBuilder.directory(this.projectFile.getParentFile());
     processBuilder.inheritIO();
     try {
       final var process = processBuilder.start();
       process.waitFor();
+      final var exitCode = process.exitValue();
+      if (exitCode != 0) {
+        panic("Build failed with exit code " + exitCode);
+      }
     } catch (final Exception e) {
       panic(e);
     }
@@ -73,12 +77,16 @@ public class MavenProject extends Project {
   @Override
   public void clean() {
     final var processBuilder =
-        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "clean", "--quiet");
+        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "clean");
     processBuilder.directory(this.projectFile.getParentFile());
     processBuilder.inheritIO();
     try {
       final var process = processBuilder.start();
       process.waitFor();
+      final var exitCode = process.exitValue();
+      if (exitCode != 0) {
+        panic("Clean failed with exit code " + exitCode);
+      }
     } catch (final Exception e) {
       panic(e);
     }
@@ -87,12 +95,16 @@ public class MavenProject extends Project {
   @Override
   public void run() {
     final var processBuilder =
-        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile", "exec:java", "--quiet");
+        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile", "exec:java");
     processBuilder.directory(this.projectFile.getParentFile());
     processBuilder.inheritIO();
     try {
       final var process = processBuilder.start();
       process.waitFor();
+      final var exitCode = process.exitValue();
+      if (exitCode != 0) {
+        panic("Run failed with exit code " + exitCode);
+      }
     } catch (final Exception e) {
       panic(e);
     }
@@ -106,7 +118,6 @@ public class MavenProject extends Project {
             "-f",
             this.projectFile.toString(),
             "compile",
-            "--quiet",
             "exec:java",
             "-Dexec.mainClass=" + className);
     processBuilder.directory(this.projectFile.getParentFile());
@@ -114,6 +125,10 @@ public class MavenProject extends Project {
     try {
       final var process = processBuilder.start();
       process.waitFor();
+      final var exitCode = process.exitValue();
+      if (exitCode != 0) {
+        panic("Run failed with exit code " + exitCode);
+      }
     } catch (final Exception e) {
       panic(e);
     }
@@ -135,12 +150,17 @@ public class MavenProject extends Project {
 
       final var compileProcessBuilder =
           new ProcessBuilder(
-              "mvn", "-f", this.projectFile.toString(), "compile", "--quiet", "-Dmaven.compiler.debug=true");
+              "mvn", "-f", this.projectFile.toString(), "compile", "-Dmaven.compiler.debug=true");
       final var compileProcess = compileProcessBuilder.start();
       try {
         compileProcess.waitFor();
       } catch (final Exception e) {
         panic(e);
+      }
+
+      final var compileExitCode = compileProcess.exitValue();
+      if (compileExitCode != 0) {
+        panic("Compile failed with exit code " + compileExitCode);
       }
 
       final var appProcessBuilder =
@@ -154,6 +174,13 @@ public class MavenProject extends Project {
       final var appProcess = appProcessBuilder.start();
 
       Thread.sleep(1000);
+
+      if (appProcess.isAlive()) {
+        System.out.println("Application is running.");
+      } else {
+        final var exitCode = appProcess.exitValue();
+        panic("Application exited with code " + exitCode);
+      }
 
       new JDB(jdbPort);
       appProcess.waitFor();
