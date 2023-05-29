@@ -1,6 +1,26 @@
 #!/bin/bash
 
-echo "Installing jack"
+command -v java >/dev/null 2>&1 || {
+  echo "Java is not installed or not in your PATH. Jack depends on Java being installed."
+  exit 1
+}
+command -v mvn >/dev/null 2>&1 || {
+  echo "Maven is not installed or not in your PATH. Jack depends on Maven being installed."
+  exit 1
+}
+
+
+cat << 'END_INTRO'
+
+     ██╗ █████╗  ██████╗██╗  ██╗
+     ██║██╔══██╗██╔════╝██║ ██╔╝
+     ██║███████║██║     █████╔╝
+██   ██║██╔══██║██║     ██╔═██╗
+╚█████╔╝██║  ██║╚██████╗██║  ██╗
+ ╚════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
+
+END_INTRO
+
 echo "Creating directory $HOME/.jack/bin"
 mkdir -p $HOME/.jack/bin || {
   echo "Failed to create directory $HOME/.jack/bin"
@@ -9,28 +29,38 @@ mkdir -p $HOME/.jack/bin || {
 }
 echo "Done"
 
-echo "Building jack from source"
-if mvn clean package --quiet && mv target/jack.jar $HOME/.jack/bin/; then
-  echo "Done"
-else
-    echo "Build failed"
-    read -r -p "Do you want to download the latest release from GitHub instead? [y/N] " response
-    case "$response" in
-      [yY][eE][sS]|[yY]) 
-        echo "Downloading latest release from GitHub"
-        curl -o $HOME/.jack/bin/jack.jar https://frank-mayer.github.io/jack/jack.jar || {
-          echo "Failed to download latest release from GitHub"
+if test -f ./pom.xml; then
+  echo "Building jack from source"
+  if mvn clean package --quiet && mv target/jack.jar $HOME/.jack/bin/; then
+    echo "Done"
+  else
+      echo "Build failed"
+      read -r -p "Do you want to download the latest release from GitHub instead? [y/N] " response
+      case "$response" in
+        [yY][eE][sS]|[yY])
+          echo "Downloading latest release from GitHub"
+          curl -o $HOME/.jack/bin/jack.jar https://frank-mayer.github.io/jack/jack.jar || {
+            echo "Failed to download latest release from GitHub"
+            echo "Installation failed"
+            exit 1
+          }
+          echo "Done"
+          ;;
+        *)
+          echo "Aborting"
           echo "Installation failed"
           exit 1
-        }
-        echo "Done"
-        ;;
-      *)
-        echo "Aborting"
-        echo "Installation failed"
-        exit 1
-        ;;
-    esac
+          ;;
+      esac
+  fi
+else
+  echo "Downloading latest release from GitHub"
+  curl -o $HOME/.jack/bin/jack.jar https://frank-mayer.github.io/jack/jack.jar || {
+    echo "Failed to download latest release from GitHub"
+    echo "Installation failed"
+    exit 1
+  }
+  echo "Done"
 fi
 
 echo "Creating wrapper script for jar file"
@@ -73,74 +103,12 @@ command -v jack >/dev/null 2>&1 || {
 
 echo "Installation complete"
 
-echo "Checking for installed Java utilities"
-function inst {
-  package_manager=$(command -v apt-get || command -v yum || command -v pacman || command -v brew)
-  if [ -z "$package_manager" ]; then
-    echo "Failed to find package manager"
-    echo "Installation of $1 failed"
-    exit 1
-  fi
-  echo "Found package manager $package_manager"
-  case "$package_manager" in
-    */apt-get)
-      sudo apt-get update || {
-        echo "Failed to update package manager"
-        echo "Installation failed"
-        exit 1
-      }
-      sudo apt-get install $1 || {
-        echo "Failed to install $1"
-        echo "Installation failed"
-        exit 1
-      }
-      ;;
-    */yum)
-      sudo yum install $1 || {
-        echo "Failed to install $1"
-        echo "Installation failed"
-        exit 1
-      }
-      ;;
-    */pacman)
-      sudo pacman -S $1 || {
-        echo "Failed to install $1"
-        echo "Installation failed"
-        exit 1
-      }
-      ;;
-    */brew)
-      brew install "$1" || {
-        echo "Failed to install $1"
-        echo "Installation failed"
-        exit 1
-      }
-      ;;
-  esac
-}
-function ask_install {
-  read -r -p "Do you want to install $1? [y/N] " response
-  case "$response" in
-    [yY][eE][sS]|[yY]) 
-      echo "Installing $1"
-      inst $1 || {
-        echo "Failed to install $1"
-        echo "Installation failed"
-        exit 1
-      }
-      echo "Done"
-      ;;
-    *)
-      echo "Aborting"
-      ;;
-  esac
-}
 command -v java >/dev/null 2>&1 || {
-  echo "Java is not installed"
+  echo "Java is not installed or not in your PATH"
   exit 1
 }
 command -v mvn >/dev/null 2>&1 || {
-  echo "Maven is not installed"
+  echo "Maven is not installed or not in your PATH"
   ask_install maven
   exit 1
 }
