@@ -399,12 +399,50 @@ public class MavenProject extends Project {
     if (entryPoint.isEmpty()) {
       panic("No entry point found");
     }
-    this.run(entryPoint.get());
+    final var processBuilder =
+        new ProcessBuilder(
+            "mvn",
+            "-f",
+            this.projectFile.toString(),
+            "compile",
+            "exec:java",
+            "-Dexec.mainClass=" + entryPoint.get());
+    processBuilder.directory(this.projectFile.getParentFile());
+    processBuilder.inheritIO();
+    try {
+      final var process = processBuilder.start();
+      process.waitFor();
+      final var exitCode = process.exitValue();
+      if (exitCode != 0) {
+        panic("Run failed with exit code " + exitCode);
+      }
+    } catch (final Exception e) {
+      panic(e);
+    }
   }
 
   @Override
   public void run(final String className) {
-    this.run(className, new String[] {});
+    final var processBuilder =
+        new ProcessBuilder(
+            "mvn",
+            "-f",
+            this.projectFile.toString(),
+            "compile",
+            "exec:java",
+            "-Dexec.mainClass=" + className);
+    processBuilder.directory(this.projectFile.getParentFile());
+    processBuilder.inheritIO();
+    try {
+      final var process = processBuilder.start();
+      process.waitFor();
+      final var exitCode = process.exitValue();
+      if (exitCode != 0) {
+        panic("Run failed with exit code " + exitCode);
+      }
+    } catch (final Exception e) {
+      panic(e);
+    }
   }
 
   @Override
@@ -413,7 +451,27 @@ public class MavenProject extends Project {
     if (entryPoint.isEmpty()) {
       panic("No entry point found");
     }
-    this.run(entryPoint.get(), args);
+    final var processBuilder =
+        new ProcessBuilder(
+            "mvn",
+            "-f",
+            this.projectFile.toString(),
+            "compile",
+            "exec:java",
+            "-Dexec.mainClass=" + entryPoint.get(),
+            "-Dexec.args='" + String.join("' '", args) + "'");
+    processBuilder.directory(this.projectFile.getParentFile());
+    processBuilder.inheritIO();
+    try {
+      final var process = processBuilder.start();
+      process.waitFor();
+      final var exitCode = process.exitValue();
+      if (exitCode != 0) {
+        panic("Run failed with exit code " + exitCode);
+      }
+    } catch (final Exception e) {
+      panic(e);
+    }
   }
 
   @Override
@@ -425,7 +483,7 @@ public class MavenProject extends Project {
             this.projectFile.toString(),
             "compile",
             "exec:java",
-            "-Dexec.mainClass=\"" + className + "\"",
+            "-Dexec.mainClass=" + className,
             "-Dexec.args='" + String.join("' '", args) + "'");
     processBuilder.directory(this.projectFile.getParentFile());
     processBuilder.inheritIO();
