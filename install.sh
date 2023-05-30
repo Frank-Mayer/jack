@@ -1,15 +1,26 @@
 #!/bin/bash
 
-cat << 'END_INTRO'
-
-     ██╗ █████╗  ██████╗██╗  ██╗
-     ██║██╔══██╗██╔════╝██║ ██╔╝
-     ██║███████║██║     █████╔╝
-██   ██║██╔══██║██║     ██╔═██╗
-╚█████╔╝██║  ██║╚██████╗██║  ██╗
- ╚════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
-
-END_INTRO
+N='\033[0;37m'
+R='\033[0;31m'
+B='\033[0;34m'
+echo -e "${n} ┌───────────────────────┐"
+echo -e "${n} │ J                     │"
+echo -e "${n} │ A                     │"
+echo -e "${n} │ C                     │"
+echo -e "${n} │ K   ${R}        (   ${N}      │"
+echo -e "${n} │     ${R}       (#   ${N}      │"
+echo -e "${n} │     ${R}     ###    ${N}      │"
+echo -e "${n} │     ${R}   ##  #,   ${N}      │"
+echo -e "${n} │     ${R}   #/ ##    ${N}      │"
+echo -e "${n} │     ${R}    #  ##   ${N}      │"
+echo -e "${n} │ ${B}   ************   *${N}   │"
+echo -e "${n} │ ${B}    **********  ** ${N}   │"
+echo -e "${n} │ ${B}     ********,     ${N}   │"
+echo -e "${n} │ ${B} *****,    ,***** *${N} ꓘ │"
+echo -e "${n} │                     Ɔ │"
+echo -e "${n} │                     Ɐ │"
+echo -e "${n} │                     ᒋ │"
+echo -e "${n} └───────────────────────┘"
 
 command -v java >/dev/null 2>&1 || {
   echo "Java is not installed or not in your PATH. Jack depends on Java being installed."
