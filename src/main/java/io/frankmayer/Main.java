@@ -85,7 +85,7 @@ public class Main {
         if (defaultClassOpt.isPresent()) {
           System.out.println(defaultClassOpt.get());
         } else {
-          System.out.println("No default class found");
+          panic("No default class found");
         }
         break;
       case "help":
