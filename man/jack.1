@@ -1,0 +1,45 @@
+.TH JACK 1 jack
+.SH NAME
+Jack \- Unified wrapper for common Java utils
+.SH USAGE
+jack <command> <options>
+.SH COMMANDS
+.TP
+.B init \-\-type <type>
+Create a new project of the given type
+.TP
+.B build
+Build the project
+.TP
+.B clean
+Clean the projects build output
+.TP
+.B rebuild
+Clean and build the project
+.TP
+.B run
+Run the project
+.TP
+.B run \-\-entry-point <entry point>
+Run the project at a given entry point
+.TP
+.B debug
+Run the project and attach a debugger
+.TP
+.B debug \-\-entry-point <entry point>
+Run the project at a given entry point and attach a debugger
+.TP
+.B default-class
+Print the default class name
+.SH OPTIONS
+.TP
+.B \-\-type
+Specify a project type ( MAVEN | GRADLE | INTELLIJ )
+.TP
+.B \-\-entry\-point
+Specify a entry point to execute
+.TP
+.B \-\-
+signals the end of options and disables further option processing. Any argument after the \-\- are passed into your application.
+.SH COPYRIGHT
+.B GPL-3.0 license

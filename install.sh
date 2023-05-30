@@ -1,15 +1,5 @@
 #!/bin/bash
 
-command -v java >/dev/null 2>&1 || {
-  echo "Java is not installed or not in your PATH. Jack depends on Java being installed."
-  exit 1
-}
-command -v mvn >/dev/null 2>&1 || {
-  echo "Maven is not installed or not in your PATH. Jack depends on Maven being installed."
-  exit 1
-}
-
-
 cat << 'END_INTRO'
 
      ██╗ █████╗  ██████╗██╗  ██╗
@@ -21,8 +11,17 @@ cat << 'END_INTRO'
 
 END_INTRO
 
+command -v java >/dev/null 2>&1 || {
+  echo "Java is not installed or not in your PATH. Jack depends on Java being installed."
+  exit 1
+}
+command -v mvn >/dev/null 2>&1 || {
+  echo "Maven is not installed or not in your PATH. Jack depends on Maven being installed."
+  exit 1
+}
+
 echo "Creating directory $HOME/.jack/bin"
-mkdir -p $HOME/.jack/bin || {
+mkdir -p "$HOME/.jack/bin" || {
   echo "Failed to create directory $HOME/.jack/bin"
   echo "Installation failed"
   exit 1
@@ -35,23 +34,21 @@ if test -f ./pom.xml; then
     echo "Done"
   else
       echo "Build failed"
-      read -r -p "Do you want to download the latest release from GitHub instead? [y/N] " response
-      case "$response" in
-        [yY][eE][sS]|[yY])
-          echo "Downloading latest release from GitHub"
-          curl -o $HOME/.jack/bin/jack.jar https://frank-mayer.github.io/jack/jack.jar || {
-            echo "Failed to download latest release from GitHub"
-            echo "Installation failed"
-            exit 1
-          }
-          echo "Done"
-          ;;
-        *)
-          echo "Aborting"
+      read -p "Do you want to download the latest release from GitHub instead? [y/N] " -n 1 -r
+      echo
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "Downloading latest release from GitHub"
+        curl -o $HOME/.jack/bin/jack.jar https://frank-mayer.github.io/jack/jack.jar || {
+          echo "Failed to download latest release from GitHub"
           echo "Installation failed"
           exit 1
-          ;;
-      esac
+        }
+        echo "Done"
+      else
+        echo "Aborting"
+        echo "Installation failed"
+        exit 1
+      fi
   fi
 else
   echo "Downloading latest release from GitHub"
@@ -75,31 +72,42 @@ chmod +x $HOME/.jack/bin/jack || {
 }
 echo "Done"
 
-command -v jack >/dev/null 2>&1 || {
-  echo "Jack is not in your PATH"
-  # find default shells rc file
-  rcfile="$HOME/.profile"
-  case "$SHELL" in
-    */zsh) rcfile="$HOME/.zshrc" ;;
-    */bash) rcfile="$HOME/.bashrc" ;;
-    */fish) rcfile="$XDG_CONFIG_HOME/fish/config.fish" ;;
-    */csh) rcfile="$HOME/.cshrc" ;;
-    */dash) rcfile="$HOME/.dashrc" ;;
-  esac
+# find default shells rc file
+rcfile="$HOME/.profile"
+case "$SHELL" in
+  */zsh) rcfile="$HOME/.zshrc" ;;
+  */bash) rcfile="$HOME/.bashrc" ;;
+  */fish) rcfile="$XDG_CONFIG_HOME/fish/config.fish" ;;
+  */csh) rcfile="$HOME/.cshrc" ;;
+  */dash) rcfile="$HOME/.dashrc" ;;
+esac
 
-  read -r -p "Do you want to add jack to PATH in '$rcfile'? [y/N] " response
-  case "$response" in
-    [yY][eE][sS]|[yY]) 
-      echo "" >> "$rcfile"
-      echo "# jack" >> "$rcfile"
-      echo "export PATH=\$PATH:$HOME/.jack/bin" >> "$rcfile"
-      ;;
-    *)
-      echo "You can add jack to your PATH manually by adding the following line to your rc file:"
-      echo "export PATH=\$PATH:$HOME/.jack/bin"
-      ;;
-  esac
+[[ $(which jack) == $HOME/.jack/bin/jack ]] || {
+  echo "Jack is not in your PATH"
+
+  read -p "Do you want to add jack to PATH in '$rcfile'? [y/N] " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "export PATH=\$PATH:$HOME/.jack/bin" >> "$rcfile"
+  else
+    echo "You can add jack to your PATH manually by adding the following line to your rc file:"
+    echo "export PATH=\$PATH:$HOME/.jack/bin"
+  fi
 }
+
+echo "Writing man pages"
+if test -f ./man/jack.1; then
+  cp man/* /usr/local/share/man/man1/ || {
+    echo "Failed to add man page"
+    exit 1
+  }
+else
+  curl -o /usr/local/share/man/man1/jack.1 https://raw.githubusercontent.com/Frank-Mayer/jack/main/man/jack.1 || {
+    echo "Failed to add man page"
+    exit 1
+  }
+fi
+echo "Done"
 
 echo "Installation complete"
 
