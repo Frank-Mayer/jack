@@ -93,9 +93,15 @@ build/
   }
 
   protected final File projectFile;
+  protected final File projectRootPath;
+
+  public File getRootPath() {
+    return this.projectRootPath;
+  }
 
   public Project(final File projectFile) {
     this.projectFile = projectFile;
+    this.projectRootPath = this.projectFile.getParentFile();
   }
 
   public String getProjectFile() {

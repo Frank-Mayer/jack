@@ -2,17 +2,23 @@ package io.frankmayer;
 
 import static io.frankmayer.Error.panic;
 
+import io.frankmayer.project.Project;
+import java.io.File;
 import java.io.IOException;
 
 public class JDB {
 
   private Process jdbProcess;
 
-  public JDB(final int jdbPort) {
+  public JDB(final int jdbPort, final Project project) {
     try {
       final var procBuilder =
           new ProcessBuilder(
-              "jdb", "-sourcepath", "./src/main/java", "-attach", String.valueOf(jdbPort));
+              "jdb",
+              "-sourcepath",
+              new File(project.getRootPath(), "./src/main/java").getPath(),
+              "-attach",
+              String.valueOf(jdbPort));
       procBuilder.inheritIO();
       this.jdbProcess = procBuilder.start();
       try {

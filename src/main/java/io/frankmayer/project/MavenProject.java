@@ -361,7 +361,7 @@ public class MavenProject extends Project {
   public void build() {
     final var processBuilder =
         new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile");
-    processBuilder.directory(this.projectFile.getParentFile());
+    processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
       final var process = processBuilder.start();
@@ -379,7 +379,7 @@ public class MavenProject extends Project {
   public void clean() {
     final var processBuilder =
         new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "clean");
-    processBuilder.directory(this.projectFile.getParentFile());
+    processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
       final var process = processBuilder.start();
@@ -407,7 +407,7 @@ public class MavenProject extends Project {
             "compile",
             "exec:java",
             "-Dexec.mainClass=" + entryPoint.get());
-    processBuilder.directory(this.projectFile.getParentFile());
+    processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
       final var process = processBuilder.start();
@@ -431,7 +431,7 @@ public class MavenProject extends Project {
             "compile",
             "exec:java",
             "-Dexec.mainClass=" + className);
-    processBuilder.directory(this.projectFile.getParentFile());
+    processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
       final var process = processBuilder.start();
@@ -460,7 +460,7 @@ public class MavenProject extends Project {
             "exec:java",
             "-Dexec.mainClass=" + entryPoint.get(),
             "-Dexec.args='" + String.join("' '", args) + "'");
-    processBuilder.directory(this.projectFile.getParentFile());
+    processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
       final var process = processBuilder.start();
@@ -485,7 +485,7 @@ public class MavenProject extends Project {
             "exec:java",
             "-Dexec.mainClass=" + className,
             "-Dexec.args='" + String.join("' '", args) + "'");
-    processBuilder.directory(this.projectFile.getParentFile());
+    processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
       final var process = processBuilder.start();
@@ -530,6 +530,7 @@ public class MavenProject extends Project {
       final var compileProcessBuilder =
           new ProcessBuilder(
               "mvn", "-f", this.projectFile.toString(), "compile", "-Dmaven.compiler.debug=true");
+      compileProcessBuilder.directory(this.projectRootPath);
       final var compileProcess = compileProcessBuilder.start();
       try {
         compileProcess.waitFor();
@@ -555,7 +556,7 @@ public class MavenProject extends Project {
                           .stream(),
                       Arrays.stream(args))
                   .toArray(String[]::new));
-      appProcessBuilder.directory(this.projectFile.getParentFile());
+      appProcessBuilder.directory(this.projectRootPath);
       final var appProcess = appProcessBuilder.start();
 
       Thread.sleep(1000);
@@ -567,7 +568,7 @@ public class MavenProject extends Project {
         panic("Application exited with code " + exitCode);
       }
 
-      new JDB(jdbPort);
+      new JDB(jdbPort, this);
       appProcess.waitFor();
     } catch (final Exception e) {
       panic(e);
