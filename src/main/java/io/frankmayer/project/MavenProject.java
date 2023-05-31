@@ -308,7 +308,7 @@ public class MavenProject extends Project {
       }
     }
     try {
-      this.document = MavenProject.builder.parse(projectFile);
+      this.document = MavenProject.builder.parse(this.projectFile);
     } catch (final Exception e) {
       panic(e);
     }
