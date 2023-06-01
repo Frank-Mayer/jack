@@ -46,9 +46,7 @@ public class CommonUtils {
   /**
    * Looks for project file like pom.xml or build.gradle in the current directory.
    *
-   * <p>
-   * Goes up the directory tree until it finds a project file or the root
-   * directory.
+   * <p>Goes up the directory tree until it finds a project file or the root directory.
    */
   public static Optional<File> getProjectFile() {
     if (CommonUtils.projectFileCache.isPresent()) {
@@ -103,7 +101,8 @@ public class CommonUtils {
     // try stty
     try {
       final var sttyProcess = new ProcessBuilder("stty", "size").start();
-      final var sttyOutput = new BufferedReader(new InputStreamReader(sttyProcess.getInputStream()));
+      final var sttyOutput =
+          new BufferedReader(new InputStreamReader(sttyProcess.getInputStream()));
       final var sttyDimensions = sttyOutput.readLine().split(" ");
       return Integer.parseInt(sttyDimensions[1]);
     } catch (final Exception e) {
@@ -128,7 +127,8 @@ public class CommonUtils {
     // try stty
     try {
       final var sttyProcess = new ProcessBuilder("stty", "size").start();
-      final var sttyOutput = new BufferedReader(new InputStreamReader(sttyProcess.getInputStream()));
+      final var sttyOutput =
+          new BufferedReader(new InputStreamReader(sttyProcess.getInputStream()));
       final var sttyDimensions = sttyOutput.readLine().split(" ");
       return Integer.parseInt(sttyDimensions[0]);
     } catch (final Exception e) {
@@ -209,35 +209,47 @@ public class CommonUtils {
         .anyMatch(node -> node.getNodeName().equals(tagName));
   }
 
-  /** Find a child Node with a given testing function */
-  public static Optional<Node> findChild(final Node parent, final Predicate<Node> test) {
-    return CommonUtils.stream(parent.getChildNodes()).filter(test).findFirst();
-  }
-
-  /** Find a child Node with a given testing function recursively */
-  public static Optional<Node> findChildDeep(final Node parent, final Predicate<Node> test) {
+  public static Optional<Node> findChild(final Node parent, final String tagName) {
     return CommonUtils.stream(parent.getChildNodes())
-        .filter(test)
-        .findFirst()
-        .or(
-            () -> CommonUtils.stream(parent.getChildNodes())
-                .map(child -> CommonUtils.findChildDeep(child, test))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .findFirst());
+        .filter(node -> node.getNodeName().equals(tagName))
+        .findFirst();
   }
 
-  public static Stream<Node> findAllNodes(final Node parent, final Predicate<Node> test) {
-    return CommonUtils.findAllNodes(parent, test, true);
-  }
-
-  public static Stream<Node> findAllNodes(
+  /** Find a child Node with a given testing function */
+  public static Optional<Node> findChild(
       final Node parent, final Predicate<Node> test, final boolean deep) {
     if (deep) {
       return CommonUtils.stream(parent.getChildNodes())
           .filter(test)
           .flatMap(
-              node -> Stream.concat(Stream.of(node), CommonUtils.findAllNodes(node, test, true)));
+              node ->
+                  Stream.concat(
+                      Stream.of(node), CommonUtils.findChildren(node, test, true).limit(1)))
+          .findFirst();
+    }
+    return CommonUtils.stream(parent.getChildNodes()).filter(test).findFirst();
+  }
+
+  /** Find a child Node with a given testing function */
+  public static Optional<Node> findChild(final Node parent, final Predicate<Node> test) {
+    return CommonUtils.findChild(parent, test, true);
+  }
+
+  public static Stream<Node> findChildren(final Node parent, final String tagName) {
+    return CommonUtils.findChildren(parent, tagName, true);
+  }
+
+  public static Stream<Node> findChildren(final Node parent, final Predicate<Node> test) {
+    return CommonUtils.findChildren(parent, test, true);
+  }
+
+  public static Stream<Node> findChildren(
+      final Node parent, final Predicate<Node> test, final boolean deep) {
+    if (deep) {
+      return CommonUtils.stream(parent.getChildNodes())
+          .filter(test)
+          .flatMap(
+              node -> Stream.concat(Stream.of(node), CommonUtils.findChildren(node, test, true)));
     } else {
       return CommonUtils.stream(parent.getChildNodes()).filter(test);
     }
@@ -247,32 +259,37 @@ public class CommonUtils {
     return IntStream.range(0, nodeList.getLength()).mapToObj(nodeList::item);
   }
 
-  /**
-   * Returns the attribute value of the given node with the given name or null if
-   * it does not exist.
-   */
-  public static String getAttribute(final Node x, final String string) {
+  /** Returns the attribute value of the given node with the given name. */
+  public static Optional<String> getAttribute(final Node x, final String string) {
     try {
-      return x.getAttributes().getNamedItem(string).getNodeValue();
+      return Optional.ofNullable(x.getAttributes().getNamedItem(string).getNodeValue());
     } catch (final Exception ignore) {
-      return null;
+      return Optional.empty();
     }
   }
 
-  private CommonUtils() {
-  }
-
   /** Find all files with a given name */
-  public static Stream<Path> findFiles(final File root, String name) {
+  public static Stream<Path> findFiles(final File root, final String name) {
     try {
-      return Files.walk(root.toPath())
-          .filter(path -> path.getFileName().toString().equals(name));
-    } catch (IOException e) {
+      return Files.walk(root.toPath()).filter(path -> path.getFileName().toString().equals(name));
+    } catch (final IOException e) {
       return Stream.empty();
     }
   }
 
-  public static Stream<Path> findFiles(final File root, String name, String ext) {
+  public static Stream<Path> findFiles(final File root, final String name, final String ext) {
     return CommonUtils.findFiles(root, name + "." + ext);
   }
+
+  private static Stream<Node> findChildren(Node parent, String tagName, boolean deep) {
+    final var test = (Predicate<Node>) node -> node.getNodeName().equals(tagName);
+    return CommonUtils.findChildren(parent, test, deep);
+  }
+
+  /** ; for windows, : for unix */
+  public static char getPathSeparator() {
+    return System.getProperty("os.name").toLowerCase().contains("windows") ? ';' : ':';
+  }
+
+  private CommonUtils() {}
 }

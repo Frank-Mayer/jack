@@ -4,7 +4,7 @@ import static io.frankmayer.Error.panic;
 
 import io.frankmayer.CommonUtils;
 import java.io.File;
-import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
@@ -147,30 +147,40 @@ public class IntelliJProject extends Project {
   }
 
   private void build4() {
+    final var outputDir = this.getOutputDir();
     // find all modules (iml files) from modules.xml
-    CommonUtils.findAllNodes(
-        this.modulesXmlDoc.getDocumentElement(),
-        x -> x.getNodeName().equals("component")
-            && CommonUtils.getAttribute(x, "name").equals("ProjectModuleManager"))
-        .flatMap(x -> CommonUtils.findAllNodes(x, y -> y.getNodeName().equals("modules")))
-        .flatMap(x -> CommonUtils.findAllNodes(x, y -> y.getNodeName().equals("module")))
+    CommonUtils.findChildren(
+            this.modulesXmlDoc.getDocumentElement(),
+            x -> {
+              if (!x.getNodeName().equals("component")) {
+                return false;
+              }
+              final var name = CommonUtils.getAttribute(x, "name");
+              if (name.isEmpty()) {
+                return false;
+              }
+              return name.get().equals("ProjectModuleManager");
+            })
+        .flatMap(x -> CommonUtils.findChildren(x, y -> y.getNodeName().equals("modules"), false))
+        .flatMap(x -> CommonUtils.findChildren(x, y -> y.getNodeName().equals("module"), false))
         .map(
             x -> {
               final var fp = CommonUtils.getAttribute(x, "filepath");
-              if (fp == null) {
+              if (fp.isEmpty()) {
                 final var fu = CommonUtils.getAttribute(x, "fileurl");
-                if (fu == null) {
+                if (fu.isEmpty()) {
                   return null;
                 }
-                return this.urlParser.parse(fu);
+                return this.urlParser.parse(fu.get());
               }
-              return fp;
+              return this.urlParser.parse(fp.get());
             })
         .filter(Objects::nonNull)
         // load each iml file
         .map(
             x -> {
               try {
+                System.out.printf("Loading '%s'%n", x);
                 return IntelliJProject.builder.parse(new File(x));
               } catch (final Exception e) {
                 panic(String.format("Failed to load '%s'%n", x), e);
@@ -179,14 +189,90 @@ public class IntelliJProject extends Project {
             })
         // find all components in each iml file
         .flatMap(
-            x -> CommonUtils.findAllNodes(
-                x.getDocumentElement(), y -> y.getNodeName().equals("component")))
-        // filter for NewModuleRootManager components
-        .filter(x -> CommonUtils.getAttribute(x, "name").equals("NewModuleRootManager"))
+            x ->
+                CommonUtils.findChildren(
+                    x.getDocumentElement(),
+                    y -> {
+                      if (!y.getNodeName().equals("component")) {
+                        return false;
+                      }
+                      // filter for NewModuleRootManager components
+                      final var name = CommonUtils.getAttribute(y, "name");
+                      if (name.isEmpty()) {
+                        return false;
+                      }
+                      return name.get().equals("NewModuleRootManager");
+                    }))
         // build the components
         .forEach(
-            x -> {
-              final var name = CommonUtils.getAttribute(x, "name");
+            (component) -> {
+              final var excludeOutput = CommonUtils.containsElement(component, "exclude-output");
+              final var contentTypes = new HashMap<String, String>();
+              CommonUtils.findChildren(component, "content")
+                  .flatMap(x -> CommonUtils.stream(x.getChildNodes()))
+                  .forEach(
+                      x -> {
+                        final var key = x.getNodeName();
+                        final var value = CommonUtils.getAttribute(x, "url");
+                        if (value.isEmpty()) {
+                          return;
+                        }
+                        if (contentTypes.containsKey(key)) {
+                          contentTypes.put(
+                              key,
+                              contentTypes.get(key) + CommonUtils.getPathSeparator() + value.get());
+                        }
+                        contentTypes.put(key, value.get());
+                      });
+              CommonUtils.findChildren(component, "orderEntry")
+                  .forEach(entry -> {
+                    final var type = CommonUtils.getAttribute(entry, "type");
+                    if (type.isEmpty()) {
+                      return;
+                    }
+                    switch (type.get()) {
+                      case "module":
+                        this.classPath.add(path);
+                        break;
+                      case "library":
+                        this.classPath.add(path);
+                        break;
+                      case "sourceFolder":
+                        this.sourcePath.add(path);
+                        break;
+                      case "inheritedJdk":
+                        this.classPath.add(path);
+                        break;
+                      case "jdk":
+                        this.classPath.add(path);
+                        break;
+                      default:
+                        System.err.printf("Unknown orderEntry type '%s'%n", type.get());
+                        break;
+                    }
+                  });
             });
+  }
+
+  private String getOutputDir() {
+    return CommonUtils.findChildren(
+            this.miscXmlDoc.getDocumentElement(),
+            x -> {
+              if (!x.getNodeName().equals("component")) {
+                return false;
+              }
+              final var name = CommonUtils.getAttribute(x, "name");
+              if (name.isEmpty()) {
+                return false;
+              }
+              return name.get().equals("ProjectRootManager");
+            })
+        .flatMap(x -> CommonUtils.findChildren(x, y -> y.getNodeName().equals("output"), false))
+        .map(x -> CommonUtils.getAttribute(x, "url"))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .map(this.urlParser::parse)
+        .findAny()
+        .orElseGet(() -> this.urlParser.parse("file://$PROJECT_DIR$/out"));
   }
 }
