@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 public class Error {
 
+  private Error() {}
+
   public static void panic(final String message) {
     System.err.println(Error.prettyPrint(message));
     System.exit(message.hashCode());
@@ -75,6 +77,4 @@ public class Error {
     sb.append("╝\n");
     return sb.toString();
   }
-
-  private Error() {}
 }

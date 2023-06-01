@@ -7,6 +7,14 @@ import java.util.Optional;
 
 public abstract class Project {
 
+  protected final File projectFile;
+  protected final File projectRootPath;
+
+  public Project(final File projectFile) {
+    this.projectFile = projectFile;
+    this.projectRootPath = this.projectFile.getParentFile();
+  }
+
   public static void create(final String string) {
     switch (string.toLowerCase()) {
       case "maven":
@@ -25,83 +33,75 @@ public abstract class Project {
   }
 
   public static String getGitignore() {
-        return """
-# Compiled class file
-target/
-*.class
+    return """
+        # Compiled class file
+        target/
+        *.class
 
-# Log file
-*.log
+        # Log file
+        *.log
 
-# BlueJ files
-*.ctxt
+        # BlueJ files
+        *.ctxt
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+        # Mobile Tools for Java (J2ME)
+        .mtj.tmp/
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+        # Package Files #
+        *.jar
+        *.war
+        *.nar
+        *.ear
+        *.zip
+        *.tar.gz
+        *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+        # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+        hs_err_pid*
+        replay_pid*
 
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+        !.mvn/wrapper/maven-wrapper.jar
+        !**/src/main/**/target/
+        !**/src/test/**/target/
 
-### IntelliJ IDEA ###
-.idea/
-*.iws
-*.iml
-*.ipr
+        ### IntelliJ IDEA ###
+        .idea/
+        *.iws
+        *.iml
+        *.ipr
 
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+        ### Eclipse ###
+        .apt_generated
+        .classpath
+        .factorypath
+        .project
+        .settings
+        .springBeans
+        .sts4-cache
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+        ### NetBeans ###
+        /nbproject/private/
+        /nbbuild/
+        /dist/
+        /nbdist/
+        /.nb-gradle/
+        build/
+        !**/src/main/**/build/
+        !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+        ### VS Code ###
+        .vscode/
 
-### Fleet ###
-.fleet/
+        ### Fleet ###
+        .fleet/
 
-### Mac OS ###
-.DS_Store
-""";
+        ### Mac OS ###
+        .DS_Store
+        """;
   }
-
-  protected final File projectFile;
-  protected final File projectRootPath;
 
   public File getRootPath() {
     return this.projectRootPath;
-  }
-
-  public Project(final File projectFile) {
-    this.projectFile = projectFile;
-    this.projectRootPath = this.projectFile.getParentFile();
   }
 
   public String getProjectFile() {
@@ -120,15 +120,15 @@ build/
 
   public abstract void run(final String[] args);
 
-  public  abstract void run(final String className, final String[] args);
+  public abstract void run(final String className, final String[] args);
 
   public abstract void debug();
 
   public abstract void debug(final String className);
 
-  public  abstract void debug(final String[] args);
+  public abstract void debug(final String[] args);
 
-  public  abstract void debug(final String string, final String[] args);
+  public abstract void debug(final String string, final String[] args);
 
   public abstract String getSourcePath();
 }

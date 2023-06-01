@@ -23,10 +23,11 @@ import org.w3c.dom.NodeList;
 
 public class CommonUtils {
 
+  private static final Scanner scanner = new Scanner(System.in);
   private static Optional<File> projectFileCache = Optional.empty();
   private static Optional<Project> projectCache = Optional.empty();
 
-  private static final Scanner scanner = new Scanner(System.in);
+  private CommonUtils() {}
 
   public static String fixJavaPackageName(final String packageName) {
     return Arrays.stream(packageName.split("\\."))
@@ -290,6 +291,4 @@ public class CommonUtils {
   public static char getPathSeparator() {
     return System.getProperty("os.name").toLowerCase().contains("windows") ? ';' : ':';
   }
-
-  private CommonUtils() {}
 }

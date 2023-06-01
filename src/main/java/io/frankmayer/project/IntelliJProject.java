@@ -14,32 +14,12 @@ import org.w3c.dom.Document;
 
 public class IntelliJProject extends Project {
 
-  private static class UrlParser {
-    private final IntelliJProject project;
-
-    public UrlParser(final IntelliJProject project) {
-      this.project = project;
-    }
-
-    public String parse(final String url) {
-      if (url.startsWith("file://$MODULE_DIR$/")) {
-        return this.project.projectFile.getParent() + "/" + url.substring(20);
-      }
-      return url;
-    }
-  }
-
   private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
   private static DocumentBuilder builder;
-
-  public static void create() {
-    panic("IntelliJ is not supported yet");
-  }
-
-  private Document modulesXmlDoc;
   private final File modulesXml;
-  private Document miscXmlDoc;
   private final IntelliJProject.UrlParser urlParser = new IntelliJProject.UrlParser(this);
+  private Document modulesXmlDoc;
+  private Document miscXmlDoc;
 
   /**
    * @param projectFile .idea directory
@@ -60,6 +40,10 @@ public class IntelliJProject extends Project {
     } catch (final Exception e) {
       panic(e);
     }
+  }
+
+  public static void create() {
+    panic("IntelliJ is not supported yet");
   }
 
   @Override
@@ -208,6 +192,13 @@ public class IntelliJProject extends Project {
             (component) -> {
               final var excludeOutput = CommonUtils.containsElement(component, "exclude-output");
               final var contentTypes = new HashMap<String, String>();
+              final var contentUrl =
+                  CommonUtils.findChild(component, "content")
+                      .flatMap(x -> CommonUtils.getAttribute(x, "url"))
+                      .map(this.urlParser::parse);
+              if (contentUrl.isEmpty()) {
+                panic(String.format("No content url for component '%s'", component));
+              }
               CommonUtils.findChildren(component, "content")
                   .flatMap(x -> CommonUtils.stream(x.getChildNodes()))
                   .forEach(
@@ -225,33 +216,44 @@ public class IntelliJProject extends Project {
                         contentTypes.put(key, value.get());
                       });
               CommonUtils.findChildren(component, "orderEntry")
-                  .forEach(entry -> {
-                    final var type = CommonUtils.getAttribute(entry, "type");
-                    if (type.isEmpty()) {
-                      return;
-                    }
-                    switch (type.get()) {
-                      case "module":
-                        this.classPath.add(path);
-                        break;
-                      case "library":
-                        this.classPath.add(path);
-                        break;
-                      case "sourceFolder":
-                        this.sourcePath.add(path);
-                        break;
-                      case "inheritedJdk":
-                        this.classPath.add(path);
-                        break;
-                      case "jdk":
-                        this.classPath.add(path);
-                        break;
-                      default:
-                        System.err.printf("Unknown orderEntry type '%s'%n", type.get());
-                        break;
-                    }
-                  });
+                  .map(
+                      entry -> {
+                        final var type = CommonUtils.getAttribute(entry, "type");
+                        if (type.isEmpty()) {
+                          return null;
+                        }
+                        switch (type.get()) {
+                          case "library":
+                            final var name = CommonUtils.getAttribute(entry, "name");
+                            if (name.isEmpty()) {
+                              return null;
+                            }
+                            return this.findLibrary(name.get(), contentUrl.get());
+                          case "sourceFolder":
+                            final var sourceFolder = CommonUtils.getAttribute(entry, "url");
+                            if (sourceFolder.isEmpty()) {
+                              return null;
+                            }
+                            return null;
+                          case "inheritedJdk":
+                            return null;
+                          default:
+                            panic(String.format("Unknown orderEntry type '%s'%n", type.get()));
+                            return null;
+                        }
+                      });
             });
+  }
+
+  private String findLibrary(final String libName, final String contentUrl) {
+    final var libOpt =
+        CommonUtils.findFiles(new File(contentUrl), libName, "jar")
+            .map(x -> x.toString())
+            .findAny();
+    if (libOpt.isEmpty()) {
+      panic(String.format("Failed to find library '%s' in '%s'%n", libName, contentUrl));
+    }
+    return libOpt.get();
   }
 
   private String getOutputDir() {
@@ -274,5 +276,21 @@ public class IntelliJProject extends Project {
         .map(this.urlParser::parse)
         .findAny()
         .orElseGet(() -> this.urlParser.parse("file://$PROJECT_DIR$/out"));
+  }
+
+  private static class UrlParser {
+
+    private final IntelliJProject project;
+
+    public UrlParser(final IntelliJProject project) {
+      this.project = project;
+    }
+
+    public String parse(final String url) {
+      if (url.startsWith("file://$MODULE_DIR$/")) {
+        return this.project.projectFile.getParent() + "/" + url.substring(20);
+      }
+      return url;
+    }
   }
 }
