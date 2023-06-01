@@ -99,6 +99,25 @@ private Set<String> sourcePath = new HashSet<>();
       panic("Failed to compile");
       return;
     }
+    final var jarProcessArgs = new ArrayList<String>();
+    jarProcessArgs.add("jar");
+    jarProcessArgs.add("cvf");
+    jarProcessArgs.add("out.jar");
+    jarProcessArgs.add("-C");
+    jarProcessArgs.add(this.getOutputDir());
+    jarProcessArgs.add(".");
+    final var jarProcessBuilder = new ProcessBuilder(jarProcessArgs);
+    jarProcessBuilder.inheritIO();
+    jarProcessBuilder.directory(this.getRootPath());
+    try {
+      final var jarProcess = jarProcessBuilder.start();
+      final var exitCode = jarProcess.waitFor();
+      if (exitCode != 0) {
+        panic("Jar process exited with code " + exitCode);
+      }
+    } catch (final Exception e) {
+      panic("Failed to run", e);
+    }
   }
 
   @Override
