@@ -524,7 +524,7 @@ public class MavenProject extends Project {
   @Override
   public void debug(final String className, final String[] args) {
     try {
-      final int jdbPort = 5005;
+      final int jdbPort = JDB.getPort();
 
       final var compileProcessBuilder =
           new ProcessBuilder(

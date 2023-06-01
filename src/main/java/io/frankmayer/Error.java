@@ -11,7 +11,7 @@ public class Error {
 
   public static void panic(final String message) {
     System.err.println(Error.prettyPrint(message));
-    System.exit(message.hashCode());
+    System.exit(message.hashCode() | 0b1);
   }
 
   public static void panic(final String message, final Throwable cause) {
@@ -19,7 +19,7 @@ public class Error {
     final var pw = new PrintWriter(sw);
     cause.printStackTrace(pw);
     System.err.println(Error.prettyPrint(message, cause.getMessage(), sw.toString()));
-    System.exit(message.hashCode());
+    System.exit(message.hashCode() | cause.hashCode() | 0b1);
   }
 
   public static void panic(final Throwable cause) {
@@ -27,7 +27,7 @@ public class Error {
     final var pw = new PrintWriter(sw);
     cause.printStackTrace(pw);
     System.err.println(Error.prettyPrint(cause.getMessage(), sw.toString()));
-    System.exit(cause.hashCode());
+    System.exit(cause.hashCode() | 0b1);
   }
 
   /** Format the given messages into a single string with a border around it. */

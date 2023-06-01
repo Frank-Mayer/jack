@@ -16,7 +16,7 @@ public class JDB {
           new ProcessBuilder(
               "jdb",
               "-sourcepath",
-              new File(project.getRootPath(), "./src/main/java").getPath(),
+              project.getSourcePath(),
               "-attach",
               String.valueOf(jdbPort));
       procBuilder.inheritIO();
@@ -29,5 +29,9 @@ public class JDB {
     } catch (final IOException e) {
       panic("Error starting JDB process");
     }
+  }
+
+  public static int getPort() {
+    return 5005;
   }
 }
