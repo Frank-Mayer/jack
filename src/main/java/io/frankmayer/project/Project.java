@@ -34,69 +34,69 @@ public abstract class Project {
 
   public static String getGitignore() {
     return """
-        # Compiled class file
-        target/
-        *.class
+# Compiled class file
+target/
+*.class
 
-        # Log file
-        *.log
+# Log file
+*.log
 
-        # BlueJ files
-        *.ctxt
+# BlueJ files
+*.ctxt
 
-        # Mobile Tools for Java (J2ME)
-        .mtj.tmp/
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
 
-        # Package Files #
-        *.jar
-        *.war
-        *.nar
-        *.ear
-        *.zip
-        *.tar.gz
-        *.rar
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
 
-        # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-        hs_err_pid*
-        replay_pid*
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+replay_pid*
 
-        !.mvn/wrapper/maven-wrapper.jar
-        !**/src/main/**/target/
-        !**/src/test/**/target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-        ### IntelliJ IDEA ###
-        .idea/
-        *.iws
-        *.iml
-        *.ipr
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
 
-        ### Eclipse ###
-        .apt_generated
-        .classpath
-        .factorypath
-        .project
-        .settings
-        .springBeans
-        .sts4-cache
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 
-        ### NetBeans ###
-        /nbproject/private/
-        /nbbuild/
-        /dist/
-        /nbdist/
-        /.nb-gradle/
-        build/
-        !**/src/main/**/build/
-        !**/src/test/**/build/
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-        ### VS Code ###
-        .vscode/
+### VS Code ###
+.vscode/
 
-        ### Fleet ###
-        .fleet/
+### Fleet ###
+.fleet/
 
-        ### Mac OS ###
-        .DS_Store
+### Mac OS ###
+.DS_Store
         """;
   }
 

@@ -53,7 +53,9 @@ public class IntelliJProject extends Project {
   private Document modulesXmlDoc;
 
   private Document miscXmlDoc;
-private Set<String> sourcePath = new HashSet<>();
+  private final Set<String> sourcePath = new HashSet<>();
+  private final Set<String> sourceFiles = new HashSet<>();
+  private final Set<String> classpath = new HashSet<>();
 
   /**
    * @param projectFile .idea directory
@@ -94,18 +96,13 @@ private Set<String> sourcePath = new HashSet<>();
 
   @Override
   public void build() {
-    final var sourcepath = this.compile();
-    if (sourcepath == null) {
-      panic("Failed to compile");
-      return;
-    }
+    this.compile();
     final var jarProcessArgs = new ArrayList<String>();
     jarProcessArgs.add("jar");
     jarProcessArgs.add("cvf");
     jarProcessArgs.add("out.jar");
-    jarProcessArgs.add("-C");
     jarProcessArgs.add(this.getOutputDir());
-    jarProcessArgs.add(".");
+    jarProcessArgs.addAll(this.classpath);
     final var jarProcessBuilder = new ProcessBuilder(jarProcessArgs);
     jarProcessBuilder.inheritIO();
     jarProcessBuilder.directory(this.getRootPath());
@@ -136,16 +133,12 @@ private Set<String> sourcePath = new HashSet<>();
       panic("No main class found");
       return;
     }
-    final var classPath = this.compile();
-    if (classPath == null) {
-      panic("Failed to compile");
-      return;
-    }
+    this.compile();
     final var mainClassName = mainClass.get();
     final var javaProcessArgs = new ArrayList<String>();
     javaProcessArgs.add("java");
     javaProcessArgs.add("-cp");
-    javaProcessArgs.add(String.join(File.pathSeparator, classPath));
+    javaProcessArgs.add(String.join(File.pathSeparator, this.classpath));
     javaProcessArgs.add(mainClassName);
     final var javaProcessBuilder = new ProcessBuilder(javaProcessArgs);
     javaProcessBuilder.inheritIO();
@@ -163,15 +156,11 @@ private Set<String> sourcePath = new HashSet<>();
 
   @Override
   public void run(final String className) {
-    final var classPath = this.compile();
-    if (classPath == null) {
-      panic("Failed to compile");
-      return;
-    }
+    this.compile();
     final var javaProcessArgs = new ArrayList<String>();
     javaProcessArgs.add("java");
     javaProcessArgs.add("-cp");
-    javaProcessArgs.add(String.join(File.pathSeparator, classPath));
+    javaProcessArgs.add(String.join(File.pathSeparator, this.classpath));
     javaProcessArgs.add(className);
     final var javaProcessBuilder = new ProcessBuilder(javaProcessArgs);
     javaProcessBuilder.inheritIO();
@@ -194,15 +183,11 @@ private Set<String> sourcePath = new HashSet<>();
       panic("No main class found");
       return;
     }
-    final var classPath = this.compile();
-    if (classPath == null) {
-      panic("Failed to compile");
-      return;
-    }
+    this.compile();
     final var javaProcessArgs = new ArrayList<String>();
     javaProcessArgs.add("java");
     javaProcessArgs.add("-cp");
-    javaProcessArgs.add(String.join(File.pathSeparator, classPath));
+    javaProcessArgs.add(String.join(File.pathSeparator, this.classpath));
     javaProcessArgs.add(mainClass.get());
     javaProcessArgs.addAll(Arrays.asList(args));
     final var javaProcessBuilder = new ProcessBuilder(javaProcessArgs);
@@ -221,15 +206,11 @@ private Set<String> sourcePath = new HashSet<>();
 
   @Override
   public void run(final String className, final String[] args) {
-    final var classPath = this.compile();
-    if (classPath == null) {
-      panic("Failed to compile");
-      return;
-    }
+    this.compile();
     final var javaProcessArgs = new ArrayList<String>();
     javaProcessArgs.add("java");
     javaProcessArgs.add("-cp");
-    javaProcessArgs.add(String.join(File.pathSeparator, classPath));
+    javaProcessArgs.add(String.join(File.pathSeparator, this.classpath));
     javaProcessArgs.add(className);
     javaProcessArgs.addAll(Arrays.asList(args));
     final var javaProcessBuilder = new ProcessBuilder(javaProcessArgs);
@@ -271,17 +252,13 @@ private Set<String> sourcePath = new HashSet<>();
 
   @Override
   public void debug(final String className, final String[] args) {
-    final var classPath = this.compile();
-    if (classPath == null) {
-      panic("Failed to compile");
-      return;
-    }
+    this.compile();
     final var jdbPort = JDB.getPort();
     final var javaProcessArgs = new ArrayList<String>();
     javaProcessArgs.add("java");
     javaProcessArgs.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + jdbPort);
     javaProcessArgs.add("-cp");
-    javaProcessArgs.add(String.join(File.pathSeparator, classPath));
+    javaProcessArgs.add(String.join(File.pathSeparator, this.classpath));
     javaProcessArgs.add(className);
     javaProcessArgs.addAll(Arrays.asList(args));
     final var appProcessBuilder = new ProcessBuilder(javaProcessArgs);
@@ -308,7 +285,7 @@ private Set<String> sourcePath = new HashSet<>();
     return String.join(CommonUtils.getPathSeparator(), this.sourcePath);
   }
 
-  private Set<String> compile() {
+  private void compile() {
     final var rootEl = this.modulesXmlDoc.getDocumentElement();
     if (rootEl == null) {
       panic("No root element in modules.xml");
@@ -316,21 +293,15 @@ private Set<String> sourcePath = new HashSet<>();
     final var modVersion = rootEl.getAttribute("version");
     switch (modVersion) {
       case "4":
-        final var sp = this.compile4();
-        if (sp == null) {
-          panic("Failed to compile");
-        }
-        
-        return sp;
+        this.compile4();
+        break;
       default:
         panic("Unsupported IntelliJ modules.xml version: " + modVersion);
+        break;
     }
-    return null;
   }
 
-  private Set<String> compile4() {
-    final var sourceFiles = new HashSet<String>();
-    final var classpath = new HashSet<String>();
+  private void compile4() {
     final var modules = this.getModulesFiles();
 
     for (final var modFile : modules) {
@@ -339,7 +310,7 @@ private Set<String> sourcePath = new HashSet<>();
         modDoc = IntelliJProject.builder.parse(modFile);
       } catch (final Exception e) {
         panic(String.format("Failed to read module file '%s'", modFile), e);
-        return null;
+        return;
       }
       final var root = modDoc.getDocumentElement();
       if (root == null) {
@@ -355,9 +326,7 @@ private Set<String> sourcePath = new HashSet<>();
         case "4":
           for (final var componentEl :
               CommonUtils.findChildren(root, "component", false).toList()) {
-            this.collectModuleComponent4(
-                 sourceFiles,
-                classpath, componentEl);
+            this.collectModuleComponent4(componentEl);
           }
           break;
         default:
@@ -373,10 +342,10 @@ private Set<String> sourcePath = new HashSet<>();
     javacArguments.add("-d");
     javacArguments.add(outputDir);
     javacArguments.add("-classpath");
-    javacArguments.add(String.join(CommonUtils.getPathSeparator(), classpath));
+    javacArguments.add(String.join(CommonUtils.getPathSeparator(), this.classpath));
     javacArguments.add("-sourcepath");
     javacArguments.add(this.getSourcePath());
-    javacArguments.addAll(sourceFiles);
+    javacArguments.addAll(this.sourceFiles);
     final var javacProcessBuilder = new ProcessBuilder(javacArguments);
     javacProcessBuilder.directory(this.getRootPath());
     javacProcessBuilder.inheritIO();
@@ -386,18 +355,13 @@ private Set<String> sourcePath = new HashSet<>();
       if (javacExitCode != 0) {
         panic("javac failed with exit code " + javacExitCode);
       }
-      classpath.add(outputDir);
-      return classpath;
+      this.classpath.add(outputDir);
     } catch (final Exception e) {
       panic("Failed to run javac", e);
     }
-    return null;
   }
 
-  private void collectModuleComponent4(
-      final HashSet<String> sourceFiles,
-      final HashSet<String> classpath,
-      final Node componentEl) {
+  private void collectModuleComponent4(final Node componentEl) {
     for (final var orderEntry :
         CommonUtils.findChildren(componentEl, "orderEntry", false).toList()) {
       final var typeOpt = CommonUtils.getAttribute(orderEntry, "type");
@@ -427,7 +391,7 @@ private Set<String> sourcePath = new HashSet<>();
           }
           final var url = this.urlParser.parse(urlOpt.get());
           this.sourcePath.add(url);
-          sourceFiles.addAll(this.collectSourceFiles(url));
+          this.sourceFiles.addAll(this.collectSourceFiles(url));
           break;
         case "library":
           final var libraryNameOpt = CommonUtils.getAttribute(orderEntry, "name");
@@ -443,7 +407,7 @@ private Set<String> sourcePath = new HashSet<>();
           }
           final var contentUrl = this.urlParser.parse(contentUrlOpt.get());
           CommonUtils.findFiles(new File(contentUrl), libraryName, "jar")
-              .forEach(x -> classpath.add(x.toString()));
+              .forEach(x -> this.classpath.add(x.toString()));
           break;
       }
     }

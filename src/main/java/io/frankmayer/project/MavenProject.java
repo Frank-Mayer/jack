@@ -28,23 +28,6 @@ public class MavenProject extends Project {
 
   private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
   private static DocumentBuilder builder;
-  private Document document;
-
-  public MavenProject(final File projectFile) {
-    super(projectFile);
-    if (MavenProject.builder == null) {
-      try {
-        MavenProject.builder = MavenProject.factory.newDocumentBuilder();
-      } catch (final ParserConfigurationException e) {
-        panic(e);
-      }
-    }
-    try {
-      this.document = MavenProject.builder.parse(this.projectFile);
-    } catch (final Exception e) {
-      panic(e);
-    }
-  }
 
   public static void create() {
     // check if pom.xml exists
@@ -308,6 +291,24 @@ public class MavenProject extends Project {
       final var source = new DOMSource(doc);
       final var result = new StreamResult(xmlFile);
       transformer.transform(source, result);
+    } catch (final Exception e) {
+      panic(e);
+    }
+  }
+
+  private Document document;
+
+  public MavenProject(final File projectFile) {
+    super(projectFile);
+    if (MavenProject.builder == null) {
+      try {
+        MavenProject.builder = MavenProject.factory.newDocumentBuilder();
+      } catch (final ParserConfigurationException e) {
+        panic(e);
+      }
+    }
+    try {
+      this.document = MavenProject.builder.parse(this.projectFile);
     } catch (final Exception e) {
       panic(e);
     }

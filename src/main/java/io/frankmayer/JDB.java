@@ -3,7 +3,6 @@ package io.frankmayer;
 import static io.frankmayer.Error.panic;
 
 import io.frankmayer.project.Project;
-import java.io.File;
 import java.io.IOException;
 
 public class JDB {
@@ -14,11 +13,7 @@ public class JDB {
     try {
       final var procBuilder =
           new ProcessBuilder(
-              "jdb",
-              "-sourcepath",
-              project.getSourcePath(),
-              "-attach",
-              String.valueOf(jdbPort));
+              "jdb", "-sourcepath", project.getSourcePath(), "-attach", String.valueOf(jdbPort));
       procBuilder.inheritIO();
       this.jdbProcess = procBuilder.start();
       try {

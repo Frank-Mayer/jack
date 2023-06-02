@@ -13,9 +13,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -47,9 +45,7 @@ public class CommonUtils {
   /**
    * Looks for project file like pom.xml or build.gradle in the current directory.
    *
-   * <p>
-   * Goes up the directory tree until it finds a project file or the root
-   * directory.
+   * <p>Goes up the directory tree until it finds a project file or the root directory.
    */
   public static Optional<File> getProjectFile() {
     if (CommonUtils.projectFileCache.isPresent()) {
@@ -104,7 +100,8 @@ public class CommonUtils {
     // try stty
     try {
       final var sttyProcess = new ProcessBuilder("stty", "size").start();
-      final var sttyOutput = new BufferedReader(new InputStreamReader(sttyProcess.getInputStream()));
+      final var sttyOutput =
+          new BufferedReader(new InputStreamReader(sttyProcess.getInputStream()));
       final var sttyDimensions = sttyOutput.readLine().split(" ");
       return Integer.parseInt(sttyDimensions[1]);
     } catch (final Exception e) {
@@ -129,7 +126,8 @@ public class CommonUtils {
     // try stty
     try {
       final var sttyProcess = new ProcessBuilder("stty", "size").start();
-      final var sttyOutput = new BufferedReader(new InputStreamReader(sttyProcess.getInputStream()));
+      final var sttyOutput =
+          new BufferedReader(new InputStreamReader(sttyProcess.getInputStream()));
       final var sttyDimensions = sttyOutput.readLine().split(" ");
       return Integer.parseInt(sttyDimensions[0]);
     } catch (final Exception e) {
@@ -223,8 +221,9 @@ public class CommonUtils {
       return CommonUtils.stream(parent.getChildNodes())
           .filter(test)
           .flatMap(
-              node -> Stream.concat(
-                  Stream.of(node), CommonUtils.findChildren(node, test, true).limit(1)))
+              node ->
+                  Stream.concat(
+                      Stream.of(node), CommonUtils.findChildren(node, test, true).limit(1)))
           .findFirst();
     }
     return CommonUtils.stream(parent.getChildNodes()).filter(test).findFirst();
@@ -247,8 +246,8 @@ public class CommonUtils {
       final Node parent, final Predicate<Node> test, final boolean deep) {
     if (deep) {
       return CommonUtils.stream(parent.getChildNodes())
-        .flatMap(x -> Stream.concat(Stream.of(x), CommonUtils.findChildren(x, test, true)))
-        .filter(test);
+          .flatMap(x -> Stream.concat(Stream.of(x), CommonUtils.findChildren(x, test, true)))
+          .filter(test);
     } else {
       return CommonUtils.stream(parent.getChildNodes()).filter(test);
     }
@@ -288,7 +287,8 @@ public class CommonUtils {
     }
   }
 
-  public static Stream<Node> findChildren(Node parent, String tagName, boolean deep) {
+  public static Stream<Node> findChildren(
+      final Node parent, final String tagName, final boolean deep) {
     final var test = (Predicate<Node>) node -> node.getNodeName().equals(tagName);
     return CommonUtils.findChildren(parent, test, deep);
   }
@@ -299,7 +299,7 @@ public class CommonUtils {
   }
 
   /** Tests if a directory exists and creates it if it doesn't */
-  public static void ensureDirectoryExists(String dirName) {
+  public static void ensureDirectoryExists(final String dirName) {
     final var dir = new File(dirName);
     if (!dir.exists()) {
       dir.mkdirs();
@@ -311,6 +311,5 @@ public class CommonUtils {
     return value;
   }
 
-  private CommonUtils() {
-  }
+  private CommonUtils() {}
 }
