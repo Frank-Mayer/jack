@@ -9,9 +9,8 @@ import java.util.Optional;
 
 public class ArgumentParser {
 
-  private String command = null;
   private final Map<String, String> options = new HashMap<>();
-
+  private String command = null;
   private Optional<String[]> remainingArguments;
 
   public ArgumentParser(final String[] args) {
@@ -20,7 +19,8 @@ public class ArgumentParser {
       final var arg = args[i];
 
       if (arg.equals("--")) {
-        this.remainingArguments = Optional.of(Arrays.stream(args, i + 1, args.length).toArray(String[]::new));
+        this.remainingArguments =
+            Optional.of(Arrays.stream(args, i + 1, args.length).toArray(String[]::new));
         break;
       }
 
@@ -35,7 +35,7 @@ public class ArgumentParser {
         }
         optionName = arg.substring(2).toLowerCase();
       } else {
-        options.put(optionName, arg);
+        this.options.put(optionName, arg);
         optionName = null;
       }
     }
@@ -54,17 +54,17 @@ public class ArgumentParser {
   }
 
   public String getCommand() {
-    return command;
+    return this.command;
   }
 
   public Optional<String> getOption(final String name) {
-    if (!options.containsKey(name)) {
+    if (!this.options.containsKey(name)) {
       return Optional.empty();
     }
-    return Optional.of(options.get(name));
+    return Optional.of(this.options.get(name));
   }
 
   public Optional<String[]> getRemainingArguments() {
-    return remainingArguments;
+    return this.remainingArguments;
   }
 }

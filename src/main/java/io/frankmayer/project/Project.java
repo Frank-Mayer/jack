@@ -7,6 +7,14 @@ import java.util.Optional;
 
 public abstract class Project {
 
+  protected final File projectFile;
+  protected final File projectRootPath;
+
+  public Project(final File projectFile) {
+    this.projectFile = projectFile;
+    this.projectRootPath = this.projectFile.getParentFile();
+  }
+
   public static void create(final String string) {
     switch (string.toLowerCase()) {
       case "maven":
@@ -25,7 +33,7 @@ public abstract class Project {
   }
 
   public static String getGitignore() {
-        return """
+    return """
 # Compiled class file
 target/
 *.class
@@ -89,19 +97,11 @@ build/
 
 ### Mac OS ###
 .DS_Store
-""";
+        """;
   }
-
-  protected final File projectFile;
-  protected final File projectRootPath;
 
   public File getRootPath() {
     return this.projectRootPath;
-  }
-
-  public Project(final File projectFile) {
-    this.projectFile = projectFile;
-    this.projectRootPath = this.projectFile.getParentFile();
   }
 
   public String getProjectFile() {
@@ -120,15 +120,15 @@ build/
 
   public abstract void run(final String[] args);
 
-  public  abstract void run(final String className, final String[] args);
+  public abstract void run(final String className, final String[] args);
 
   public abstract void debug();
 
   public abstract void debug(final String className);
 
-  public  abstract void debug(final String[] args);
+  public abstract void debug(final String[] args);
 
-  public  abstract void debug(final String string, final String[] args);
+  public abstract void debug(final String string, final String[] args);
 
   public abstract String getSourcePath();
 }

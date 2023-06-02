@@ -18,7 +18,9 @@
 
 Jack solves these problems.
 
-Don't worry, this is not yet another build tool that tries to replace Maven and Gradle. Those are good tools and there is no need to replace them. The point is that you can work with any Java project without worrying about what build tool is used and how that works.
+Don't worry, this is not yet another build tool that tries to replace Maven and Gradle. Those are
+good tools and there is no need to replace them. The point is that you can work with any Java
+project without worrying about what build tool is used and how that works.
 
 ---
 
@@ -26,12 +28,14 @@ Don't worry, this is not yet another build tool that tries to replace Maven and 
 
 ## Documentation
 
-Detailed and up to date information is provided in [this repos wiki](https://github.com/Frank-Mayer/jack/wiki).
+Detailed and up to date information is provided
+in [this repos wiki](https://github.com/Frank-Mayer/jack/wiki).
 
 ## The tools you want to use need to be installed and avaliable in PATH
 
 You can install them from the websites or using your package manager.
 
-- java ([Oracle JDK](https://www.oracle.com/de/java/technologies/downloads/)/[OpenJDK](https://openjdk.org/)/[Amazon Corretto](https://aws.amazon.com/de/corretto/?filtered-posts.sort-by=item.additionalFields.createdDate&filtered-posts.sort-order=desc)/…)
+-
+java ([Oracle JDK](https://www.oracle.com/de/java/technologies/downloads/)/[OpenJDK](https://openjdk.org/)/[Amazon Corretto](https://aws.amazon.com/de/corretto/?filtered-posts.sort-by=item.additionalFields.createdDate&filtered-posts.sort-order=desc)/…)
 - [jdb](https://docs.oracle.com/en/java/javase/11/tools/jdb.html)
 - [maven](https://maven.apache.org/)

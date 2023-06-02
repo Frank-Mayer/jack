@@ -308,7 +308,7 @@ public class MavenProject extends Project {
       }
     }
     try {
-      this.document = MavenProject.builder.parse(projectFile);
+      this.document = MavenProject.builder.parse(this.projectFile);
     } catch (final Exception e) {
       panic(e);
     }
@@ -525,7 +525,7 @@ public class MavenProject extends Project {
   @Override
   public void debug(final String className, final String[] args) {
     try {
-      final int jdbPort = 5005;
+      final int jdbPort = JDB.getPort();
 
       final var compileProcessBuilder =
           new ProcessBuilder(
