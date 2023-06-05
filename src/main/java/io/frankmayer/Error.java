@@ -32,49 +32,22 @@ public class Error {
 
   /** Format the given messages into a single string with a border around it. */
   private static String prettyPrint(final String... messages) {
-    var longestLine = 0;
-    final var textBlocks =
-        Arrays.stream(messages)
-            .map(message -> message.replaceAll("\t", "    "))
-            .collect(Collectors.toList());
-    final var sb = new StringBuilder();
-    for (final var message : textBlocks) {
-      final var lines = message.split("\n");
-      for (final var line : lines) {
-        if (line.length() > longestLine) {
-          longestLine = line.length();
-        }
-      }
-    }
-    sb.append('╔');
-    for (var i = 0; i < longestLine; ++i) {
-      sb.append('═');
-    }
-    var blockCount = 0;
-    sb.append("╗\n");
-    for (final var message : textBlocks) {
-      final var lines = message.split("\n");
-      for (final var line : lines) {
-        sb.append('║');
-        sb.append(line);
-        for (var i = line.length(); i < longestLine; ++i) {
-          sb.append(' ');
-        }
-        sb.append("║\n");
-      }
-      if (++blockCount < textBlocks.size()) {
-        sb.append('╠');
-        for (var i = 0; i < longestLine; ++i) {
-          sb.append('═');
-        }
-        sb.append("╣\n");
-      }
-    }
-    sb.append('╚');
-    for (var i = 0; i < longestLine; ++i) {
-      sb.append('═');
-    }
-    sb.append("╝\n");
-    return sb.toString();
+    return Arrays.stream(messages)
+        .map(message -> RED + "■ " + message)
+        .map(
+            message -> Arrays.stream(message.split("\n")).collect(Collectors.joining("\n  " + RED)))
+        .collect(Collectors.joining("\n"));
   }
+
+  /** Color code for system terminal (Windows or Unix). */
+  private static String RED =
+      System.getProperty("os.name").startsWith("Windows")
+          ? System.getenv("ESC") + "[31m"
+          : "\033[31m";
+
+  /** Color code for system terminal (Windows or Unix). */
+  private static String RESET =
+      System.getProperty("os.name").startsWith("Windows")
+          ? System.getenv("ESC") + "[0m"
+          : "\033[0m";
 }
