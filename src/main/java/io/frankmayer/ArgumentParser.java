@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class ArgumentParser {
+public final class ArgumentParser {
 
   private final Map<String, String> options = new HashMap<>();
   private String command = null;
@@ -53,18 +53,22 @@ public class ArgumentParser {
     }
   }
 
-  public String getCommand() {
+  public final String getCommand() {
     return this.command;
   }
 
-  public Optional<String> getOption(final String name) {
+  public final Optional<String> getOption(final String name) {
     if (!this.options.containsKey(name)) {
       return Optional.empty();
     }
     return Optional.of(this.options.get(name));
   }
 
-  public Optional<String[]> getRemainingArguments() {
+  public final Optional<String[]> getRemainingArguments() {
     return this.remainingArguments;
+  }
+
+  public final boolean flag(String string) {
+    return false;
   }
 }

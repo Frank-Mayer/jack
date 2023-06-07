@@ -4,12 +4,14 @@ import static io.frankmayer.Error.panic;
 
 import io.frankmayer.CommonUtils;
 import io.frankmayer.JDB;
+import io.frankmayer.Main;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -24,12 +26,12 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-public class MavenProject extends Project {
+public final class MavenProject extends Project {
 
   private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
   private static DocumentBuilder builder;
 
-  public static void create() {
+  public static final void create() {
     // check if pom.xml exists
     final var pomXmlFile = new File("pom.xml");
 
@@ -277,7 +279,7 @@ public class MavenProject extends Project {
     System.out.println("Done");
   }
 
-  private static void writeDocumentToFile(final Document doc, final File xmlFile) {
+  private static final void writeDocumentToFile(final Document doc, final File xmlFile) {
     try {
       final var transformerFactory = TransformerFactory.newInstance();
       final var transformer = transformerFactory.newTransformer();
@@ -315,7 +317,7 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public Optional<String> getDefaultClassName() {
+  public final Optional<String> getDefaultClassName() {
     // look for project.build.plugins.plugin
     // groupId = org.codehaus.mojo
     // and artifactId = exec-maven-plugin in this.document
@@ -358,9 +360,16 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public void build() {
-    final var processBuilder =
-        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "compile");
+  public final void build() {
+    final var mvnArgs = new ArrayList<String>();
+    mvnArgs.add("mvn");
+    mvnArgs.add("-f");
+    mvnArgs.add(this.projectFile.toString());
+    mvnArgs.add("compile");
+    if (Main.getArgs().getOption("verbose").isEmpty()) {
+      mvnArgs.add("--quiet");
+    }
+    final var processBuilder = new ProcessBuilder(mvnArgs);
     processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
@@ -376,9 +385,16 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public void clean() {
-    final var processBuilder =
-        new ProcessBuilder("mvn", "-f", this.projectFile.toString(), "clean");
+  public final void clean() {
+    final var mvnArgs = new ArrayList<String>();
+    mvnArgs.add("mvn");
+    if (!Main.getArgs().flag("verbose")) {
+      mvnArgs.add("--quiet");
+    }
+    mvnArgs.add("-f");
+    mvnArgs.add(this.projectFile.toString());
+    mvnArgs.add("clean");
+    final var processBuilder = new ProcessBuilder(mvnArgs);
     processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
@@ -394,19 +410,22 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public void run() {
+  public final void run() {
     final var entryPoint = this.getDefaultClassName();
     if (entryPoint.isEmpty()) {
       panic("No entry point found");
     }
-    final var processBuilder =
-        new ProcessBuilder(
-            "mvn",
-            "-f",
-            this.projectFile.toString(),
-            "compile",
-            "exec:java",
-            "-Dexec.mainClass=" + entryPoint.get());
+    final var mvnArgs = new ArrayList<String>();
+    mvnArgs.add("mvn");
+    if (!Main.getArgs().flag("verbose")) {
+      mvnArgs.add("--quiet");
+    }
+    mvnArgs.add("-f");
+    mvnArgs.add(this.projectFile.toString());
+    mvnArgs.add("compile");
+    mvnArgs.add("exec:java");
+    mvnArgs.add("-Dexec.mainClass=" + entryPoint.get());
+    final var processBuilder = new ProcessBuilder(mvnArgs);
     processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
@@ -422,15 +441,18 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public void run(final String className) {
-    final var processBuilder =
-        new ProcessBuilder(
-            "mvn",
-            "-f",
-            this.projectFile.toString(),
-            "compile",
-            "exec:java",
-            "-Dexec.mainClass=" + className);
+  public final void run(final String className) {
+    final var mvnArgs = new ArrayList<String>();
+    mvnArgs.add("mvn");
+    if (!Main.getArgs().flag("verbose")) {
+      mvnArgs.add("--quiet");
+    }
+    mvnArgs.add("-f");
+    mvnArgs.add(this.projectFile.toString());
+    mvnArgs.add("compile");
+    mvnArgs.add("exec:java");
+    mvnArgs.add("-Dexec.mainClass=" + className);
+    final var processBuilder = new ProcessBuilder(mvnArgs);
     processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
@@ -446,20 +468,23 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public void run(final String[] args) {
+  public final void run(final String[] args) {
     final var entryPoint = this.getDefaultClassName();
     if (entryPoint.isEmpty()) {
       panic("No entry point found");
     }
-    final var processBuilder =
-        new ProcessBuilder(
-            "mvn",
-            "-f",
-            this.projectFile.toString(),
-            "compile",
-            "exec:java",
-            "-Dexec.mainClass=" + entryPoint.get(),
-            "-Dexec.args='" + String.join("' '", args) + "'");
+    final var mvnArgs = new ArrayList<String>();
+    mvnArgs.add("mvn");
+    if (!Main.getArgs().flag("verbose")) {
+      mvnArgs.add("--quiet");
+    }
+    mvnArgs.add("-f");
+    mvnArgs.add(this.projectFile.toString());
+    mvnArgs.add("compile");
+    mvnArgs.add("exec:java");
+    mvnArgs.add("-Dexec.mainClass=" + entryPoint.get());
+    mvnArgs.add("-Dexec.args='" + String.join("' '", args) + "'");
+    final var processBuilder = new ProcessBuilder(mvnArgs);
     processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
@@ -475,16 +500,20 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public void run(final String className, final String[] args) {
-    final var processBuilder =
-        new ProcessBuilder(
-            "mvn",
-            "-f",
-            this.projectFile.toString(),
-            "compile",
-            "exec:java",
-            "-Dexec.mainClass=" + className,
-            "-Dexec.args='" + String.join("' '", args) + "'");
+  public final void run(final String className, final String[] args) {
+    final var mvnArgs = new ArrayList<String>();
+    mvnArgs.add("mvn");
+    if (!Main.getArgs().flag("verbose")) {
+      mvnArgs.add("--quiet");
+      mvnArgs.add("-f");
+      mvnArgs.add(this.projectFile.toString());
+      mvnArgs.add("compile");
+      mvnArgs.add("exec:java");
+    }
+    mvnArgs.add("-Dexec.mainClass=" + className);
+    mvnArgs.add("-Dexec.args='" + String.join("' '", args) + "'");
+
+    final var processBuilder = new ProcessBuilder(mvnArgs);
     processBuilder.directory(this.projectRootPath);
     processBuilder.inheritIO();
     try {
@@ -500,7 +529,7 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public void debug() {
+  public final void debug() {
     final var defaultClassName = this.getDefaultClassName();
     if (!defaultClassName.isPresent()) {
       panic("No default class name found");
@@ -514,7 +543,7 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public void debug(final String[] args) {
+  public final void debug(final String[] args) {
     final var defaultClassName = this.getDefaultClassName();
     if (!defaultClassName.isPresent()) {
       panic("No default class name found");
@@ -523,13 +552,21 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public void debug(final String className, final String[] args) {
+  public final void debug(final String className, final String[] args) {
     try {
       final int jdbPort = JDB.getPort();
+      final var mvnArgs = new ArrayList<String>();
+      mvnArgs.add("mvn");
+      mvnArgs.add("-f");
+      mvnArgs.add(this.projectFile.toString());
+      mvnArgs.add("compile");
+      mvnArgs.add("-Dmaven.compiler.debug=true");
+      mvnArgs.add("-Dmaven.compiler.debuglevel=source,lines");
+      if (!Main.getArgs().flag("verbose")) {
+        mvnArgs.add("--quiet");
+      }
 
-      final var compileProcessBuilder =
-          new ProcessBuilder(
-              "mvn", "-f", this.projectFile.toString(), "compile", "-Dmaven.compiler.debug=true");
+      final var compileProcessBuilder = new ProcessBuilder(mvnArgs);
       compileProcessBuilder.directory(this.projectRootPath);
       final var compileProcess = compileProcessBuilder.start();
       try {
@@ -576,7 +613,7 @@ public class MavenProject extends Project {
   }
 
   @Override
-  public String getSourcePath() {
+  public final String getSourcePath() {
     // src/main/java
     final var joiner = new StringJoiner(File.separator);
     joiner.add("src");

@@ -20,9 +20,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-public class IntelliJProject extends Project {
+public final class IntelliJProject extends Project {
 
-  private static class UrlParser {
+  private static final class UrlParser {
 
     private final IntelliJProject project;
 
@@ -30,7 +30,7 @@ public class IntelliJProject extends Project {
       this.project = project;
     }
 
-    public String parse(final String url) {
+    public final String parse(final String url) {
       if (url.startsWith("file://")) {
         return this.parse(url.substring(7));
       }
@@ -42,7 +42,7 @@ public class IntelliJProject extends Project {
   private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
   private static DocumentBuilder builder;
 
-  public static void create() {
+  public static final void create() {
     panic("IntelliJ is not supported yet");
   }
 
@@ -90,12 +90,12 @@ public class IntelliJProject extends Project {
   }
 
   @Override
-  public Optional<String> getDefaultClassName() {
+  public final Optional<String> getDefaultClassName() {
     return Optional.empty();
   }
 
   @Override
-  public void build() {
+  public final void build() {
     this.compile();
     final var jarProcessArgs = new ArrayList<String>();
     jarProcessArgs.add("jar");
@@ -118,7 +118,7 @@ public class IntelliJProject extends Project {
   }
 
   @Override
-  public void clean() {
+  public final void clean() {
     final var outDir = new File(this.getOutputDir());
     if (!outDir.exists()) {
       return;
@@ -127,7 +127,7 @@ public class IntelliJProject extends Project {
   }
 
   @Override
-  public void run() {
+  public final void run() {
     final var mainClass = this.getDefaultClassName();
     if (mainClass.isEmpty()) {
       panic("No main class found");
@@ -155,7 +155,7 @@ public class IntelliJProject extends Project {
   }
 
   @Override
-  public void run(final String className) {
+  public final void run(final String className) {
     this.compile();
     final var javaProcessArgs = new ArrayList<String>();
     javaProcessArgs.add("java");
@@ -177,7 +177,7 @@ public class IntelliJProject extends Project {
   }
 
   @Override
-  public void run(final String[] args) {
+  public final void run(final String[] args) {
     final var mainClass = this.getDefaultClassName();
     if (mainClass.isEmpty()) {
       panic("No main class found");
@@ -205,7 +205,7 @@ public class IntelliJProject extends Project {
   }
 
   @Override
-  public void run(final String className, final String[] args) {
+  public final void run(final String className, final String[] args) {
     this.compile();
     final var javaProcessArgs = new ArrayList<String>();
     javaProcessArgs.add("java");
@@ -228,7 +228,7 @@ public class IntelliJProject extends Project {
   }
 
   @Override
-  public void debug() {
+  public final void debug() {
     final var defaultClassName = this.getDefaultClassName();
     if (!defaultClassName.isPresent()) {
       panic("No default class name found");
@@ -237,12 +237,12 @@ public class IntelliJProject extends Project {
   }
 
   @Override
-  public void debug(final String className) {
+  public final void debug(final String className) {
     this.debug(className, new String[0]);
   }
 
   @Override
-  public void debug(final String[] args) {
+  public final void debug(final String[] args) {
     final var defaultClassName = this.getDefaultClassName();
     if (!defaultClassName.isPresent()) {
       panic("No default class name found");
@@ -251,7 +251,7 @@ public class IntelliJProject extends Project {
   }
 
   @Override
-  public void debug(final String className, final String[] args) {
+  public final void debug(final String className, final String[] args) {
     this.compile();
     final var jdbPort = JDB.getPort();
     final var javaProcessArgs = new ArrayList<String>();
@@ -281,11 +281,11 @@ public class IntelliJProject extends Project {
   }
 
   @Override
-  public String getSourcePath() {
+  public final String getSourcePath() {
     return String.join(CommonUtils.getPathSeparator(), this.sourcePath);
   }
 
-  private void compile() {
+  private final void compile() {
     final var rootEl = this.modulesXmlDoc.getDocumentElement();
     if (rootEl == null) {
       panic("No root element in modules.xml");
@@ -301,7 +301,7 @@ public class IntelliJProject extends Project {
     }
   }
 
-  private void compile4() {
+  private final void compile4() {
     final var modules = this.getModulesFiles();
 
     for (final var modFile : modules) {
@@ -361,7 +361,7 @@ public class IntelliJProject extends Project {
     }
   }
 
-  private void collectModuleComponent4(final Node componentEl) {
+  private final void collectModuleComponent4(final Node componentEl) {
     for (final var orderEntry :
         CommonUtils.findChildren(componentEl, "orderEntry", false).toList()) {
       final var typeOpt = CommonUtils.getAttribute(orderEntry, "type");
@@ -413,7 +413,7 @@ public class IntelliJProject extends Project {
     }
   }
 
-  private List<String> collectSourceFiles(final String sourcePath) {
+  private final List<String> collectSourceFiles(final String sourcePath) {
     try {
       return Files.walk(Paths.get(this.urlParser.parse(sourcePath)))
           .filter(Files::isRegularFile)
@@ -426,7 +426,7 @@ public class IntelliJProject extends Project {
     }
   }
 
-  private List<File> getModulesFiles() {
+  private final List<File> getModulesFiles() {
     return CommonUtils.findChildren(this.modulesXmlDoc.getDocumentElement(), "module")
         .map(
             moduleEl -> {
@@ -446,7 +446,7 @@ public class IntelliJProject extends Project {
         .toList();
   }
 
-  private String getOutputDir() {
+  private final String getOutputDir() {
     return CommonUtils.findChildren(
             this.miscXmlDoc.getDocumentElement(),
             x -> {

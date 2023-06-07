@@ -5,7 +5,11 @@ import static io.frankmayer.Error.panic;
 import io.frankmayer.project.Project;
 import java.io.IOException;
 
-public class JDB {
+public final class JDB {
+
+  public static final int getPort() {
+    return 5005;
+  }
 
   private Process jdbProcess;
 
@@ -24,9 +28,5 @@ public class JDB {
     } catch (final IOException e) {
       panic("Error starting JDB process");
     }
-  }
-
-  public static int getPort() {
-    return 5005;
   }
 }

@@ -15,7 +15,7 @@ public abstract class Project {
     this.projectRootPath = this.projectFile.getParentFile();
   }
 
-  public static void create(final String string) {
+  public static final void create(final String string) {
     switch (string.toLowerCase()) {
       case "maven":
         MavenProject.create();
@@ -32,7 +32,7 @@ public abstract class Project {
     }
   }
 
-  public static String getGitignore() {
+  public static final String getGitignore() {
     return """
 # Compiled class file
 target/
@@ -100,11 +100,11 @@ build/
         """;
   }
 
-  public File getRootPath() {
+  public final File getRootPath() {
     return this.projectRootPath;
   }
 
-  public String getProjectFile() {
+  public final String getProjectFile() {
     return this.projectFile.getPath();
   }
 

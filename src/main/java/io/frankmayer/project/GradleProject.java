@@ -5,84 +5,84 @@ import static io.frankmayer.Error.panic;
 import java.io.File;
 import java.util.Optional;
 
-public class GradleProject extends Project {
+public final class GradleProject extends Project {
 
   public GradleProject(final File projectFile) {
     super(projectFile);
     panic("Gradle is not supported yet");
   }
 
-  public static void create() {
+  public static final void create() {
     panic("Gradle is not supported yet");
   }
 
   @Override
-  public Optional<String> getDefaultClassName() {
+  public final Optional<String> getDefaultClassName() {
     return Optional.empty();
   }
 
   @Override
-  public void build() {
+  public final void build() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'build'");
   }
 
   @Override
-  public void clean() {
+  public final void clean() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'clean'");
   }
 
   @Override
-  public void run() {
+  public final void run() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'run'");
   }
 
   @Override
-  public void run(final String className) {
+  public final void run(final String className) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'run'");
   }
 
   @Override
-  public void run(final String[] args) {
+  public final void run(final String[] args) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'run'");
   }
 
   @Override
-  public void run(final String className, final String[] args) {
+  public final void run(final String className, final String[] args) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'run'");
   }
 
   @Override
-  public void debug() {
+  public final void debug() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'debug'");
   }
 
   @Override
-  public void debug(final String className) {
+  public final void debug(final String className) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'debug'");
   }
 
   @Override
-  public void debug(final String[] args) {
+  public final void debug(final String[] args) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'debug'");
   }
 
   @Override
-  public void debug(final String string, final String[] args) {
+  public final void debug(final String string, final String[] args) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'debug'");
   }
 
   @Override
-  public String getSourcePath() {
+  public final String getSourcePath() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'getClassPath'");
   }

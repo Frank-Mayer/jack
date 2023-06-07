@@ -4,15 +4,20 @@ import static io.frankmayer.Error.panic;
 
 import io.frankmayer.project.Project;
 
-public class Main {
+public final class Main {
+  private static ArgumentParser args;
 
-  public static void main(final String[] args) {
-    final var parser = new ArgumentParser(args);
+  public static final ArgumentParser getArgs() {
+    return Main.args;
+  }
+
+  public static final void main(final String[] args) {
+    Main.args = new ArgumentParser(args);
     final var projOpt = CommonUtils.getProject();
 
-    switch (parser.getCommand()) {
+    switch (Main.args.getCommand()) {
       case "init":
-        final var projectType = parser.getOption("type");
+        final var projectType = Main.args.getOption("type");
         if (projectType.isEmpty()) {
           panic("Missing project type");
         }
@@ -41,8 +46,8 @@ public class Main {
         if (projOpt.isEmpty()) {
           panic("No project found");
         }
-        final var entryPoint = parser.getOption("entry-point");
-        final var passArgs = parser.getRemainingArguments();
+        final var entryPoint = Main.args.getOption("entry-point");
+        final var passArgs = Main.args.getRemainingArguments();
         if (entryPoint.isPresent()) {
           if (passArgs.isPresent()) {
             projOpt.get().run(entryPoint.get(), passArgs.get());
@@ -61,8 +66,8 @@ public class Main {
         if (projOpt.isEmpty()) {
           panic("No project found");
         }
-        final var debugEntryPoint = parser.getOption("entry-point");
-        final var debugPassArgs = parser.getRemainingArguments();
+        final var debugEntryPoint = Main.args.getOption("entry-point");
+        final var debugPassArgs = Main.args.getRemainingArguments();
         if (debugEntryPoint.isPresent()) {
           if (debugPassArgs.isPresent()) {
             projOpt.get().debug(debugEntryPoint.get(), debugPassArgs.get());
@@ -105,7 +110,7 @@ public class Main {
         System.out.println("help                Print this help message");
         break;
       default:
-        panic(String.format("Unknown command '%s'", parser.getCommand()));
+        panic(String.format("Unknown command '%s'", Main.args.getCommand()));
     }
   }
 }

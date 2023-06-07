@@ -107,6 +107,11 @@ esac
 }
 
 echo "Writing man pages"
+if [ ! -d /usr/local/share/man/man1/ ]; then
+  echo "Directory does not exist, creating it"
+  sudo mkdir -p /usr/local/share/man/man1/
+  sudo chmod -R 666 /usr/local/share/man/
+fi
 if test -f ./man/jack.1; then
   cp man/* /usr/local/share/man/man1/ || {
     echo "Failed to add man page"

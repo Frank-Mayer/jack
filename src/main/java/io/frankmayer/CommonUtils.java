@@ -21,13 +21,13 @@ import java.util.stream.Stream;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class CommonUtils {
+public final class CommonUtils {
 
   private static final Scanner scanner = new Scanner(System.in);
   private static Optional<File> projectFileCache = Optional.empty();
   private static Optional<Project> projectCache = Optional.empty();
 
-  public static String fixJavaPackageName(final String packageName) {
+  public static final String fixJavaPackageName(final String packageName) {
     return Arrays.stream(packageName.split("\\."))
         .map(CommonUtils::fixJavaArtifactName)
         .filter(x -> !x.isEmpty())
@@ -35,7 +35,7 @@ public class CommonUtils {
         .orElse("");
   }
 
-  public static String fixJavaArtifactName(final String artifactName) {
+  public static final String fixJavaArtifactName(final String artifactName) {
     return artifactName
         .replaceAll("[-]+", "_")
         .replaceAll("[^a-zA-Z0-9_]", "")
@@ -47,7 +47,7 @@ public class CommonUtils {
    *
    * <p>Goes up the directory tree until it finds a project file or the root directory.
    */
-  public static Optional<File> getProjectFile() {
+  public static final Optional<File> getProjectFile() {
     if (CommonUtils.projectFileCache.isPresent()) {
       return CommonUtils.projectFileCache;
     }
@@ -80,7 +80,7 @@ public class CommonUtils {
    *
    * @return The project for the current project.
    */
-  public static Optional<Project> getProject() {
+  public static final Optional<Project> getProject() {
     CommonUtils.getProjectFile();
     return CommonUtils.projectCache;
   }
@@ -90,7 +90,7 @@ public class CommonUtils {
    *
    * @return The current terminal width. -1 if it could not be determined.
    */
-  public static int getTerminalWidth() {
+  public static final int getTerminalWidth() {
     // try env variable COLUMNS
     final var terminalWidth = System.getenv("COLUMNS");
     if (terminalWidth != null) {
@@ -116,7 +116,7 @@ public class CommonUtils {
    *
    * @return The current terminal height. -1 if it could not be determined.
    */
-  public static int getTerminalHeight() {
+  public static final int getTerminalHeight() {
     // try env variable LINES
     final var terminalHeight = System.getenv("LINES");
     if (terminalHeight != null) {
@@ -137,22 +137,22 @@ public class CommonUtils {
     return -1;
   }
 
-  public static void setCursorPosition(final int x, final int y) {
+  public static final void setCursorPosition(final int x, final int y) {
     System.out.print("\033[" + y + ';' + x + 'H');
   }
 
-  public static String askString(final String string) {
+  public static final String askString(final String string) {
     System.out.print(string + ": ");
     return CommonUtils.scanner.nextLine().trim();
   }
 
-  public static String askString(final String string, final String defaultValue) {
+  public static final String askString(final String string, final String defaultValue) {
     System.out.print(string + " [" + defaultValue + "]: ");
     final var input = CommonUtils.scanner.nextLine().trim();
     return input.isEmpty() ? defaultValue : input;
   }
 
-  public static boolean confirm(final String string, final boolean defaultValue) {
+  public static final boolean confirm(final String string, final boolean defaultValue) {
     while (true) {
       if (defaultValue) {
         System.out.print(string + " [Y/n]: ");
@@ -175,7 +175,7 @@ public class CommonUtils {
     }
   }
 
-  public static boolean confirm(final String string) {
+  public static final boolean confirm(final String string) {
     while (true) {
       System.out.print(string + " [y/n]: ");
       final var input = CommonUtils.scanner.nextLine().trim();
@@ -192,7 +192,7 @@ public class CommonUtils {
     }
   }
 
-  public static String getJavaMajorVersion() {
+  public static final String getJavaMajorVersion() {
     try {
       final var javaVersion = System.getProperty("java.version");
       final var javaVersionParts = javaVersion.split("\\.");
@@ -203,19 +203,19 @@ public class CommonUtils {
     }
   }
 
-  public static boolean containsElement(final Node parent, final String tagName) {
+  public static final boolean containsElement(final Node parent, final String tagName) {
     return CommonUtils.stream(parent.getChildNodes())
         .anyMatch(node -> node.getNodeName().equals(tagName));
   }
 
-  public static Optional<Node> findChild(final Node parent, final String tagName) {
+  public static final Optional<Node> findChild(final Node parent, final String tagName) {
     return CommonUtils.stream(parent.getChildNodes())
         .filter(node -> node.getNodeName().equals(tagName))
         .findFirst();
   }
 
   /** Find a child Node with a given testing function */
-  public static Optional<Node> findChild(
+  public static final Optional<Node> findChild(
       final Node parent, final Predicate<Node> test, final boolean deep) {
     if (deep) {
       return CommonUtils.stream(parent.getChildNodes())
@@ -230,19 +230,19 @@ public class CommonUtils {
   }
 
   /** Find a child Node with a given testing function */
-  public static Optional<Node> findChild(final Node parent, final Predicate<Node> test) {
+  public static final Optional<Node> findChild(final Node parent, final Predicate<Node> test) {
     return CommonUtils.findChild(parent, test, true);
   }
 
-  public static Stream<Node> findChildren(final Node parent, final String tagName) {
+  public static final Stream<Node> findChildren(final Node parent, final String tagName) {
     return CommonUtils.findChildren(parent, tagName, true);
   }
 
-  public static Stream<Node> findChildren(final Node parent, final Predicate<Node> test) {
+  public static final Stream<Node> findChildren(final Node parent, final Predicate<Node> test) {
     return CommonUtils.findChildren(parent, test, true);
   }
 
-  public static Stream<Node> findChildren(
+  public static final Stream<Node> findChildren(
       final Node parent, final Predicate<Node> test, final boolean deep) {
     if (deep) {
       return CommonUtils.stream(parent.getChildNodes())
@@ -253,12 +253,12 @@ public class CommonUtils {
     }
   }
 
-  public static Stream<Node> stream(final NodeList nodeList) {
+  public static final Stream<Node> stream(final NodeList nodeList) {
     return IntStream.range(0, nodeList.getLength()).mapToObj(nodeList::item);
   }
 
   /** Returns the attribute value of the given node with the given name. */
-  public static Optional<String> getAttribute(final Node x, final String string) {
+  public static final Optional<String> getAttribute(final Node x, final String string) {
     try {
       return Optional.ofNullable(x.getAttributes().getNamedItem(string).getNodeValue());
     } catch (final Exception ignore) {
@@ -267,7 +267,7 @@ public class CommonUtils {
   }
 
   /** Find all files with a given name */
-  public static Stream<Path> findFiles(final File root, final String name) {
+  public static final Stream<Path> findFiles(final File root, final String name) {
     try {
       return Files.walk(root.toPath()).filter(path -> path.getFileName().toString().equals(name));
     } catch (final IOException e) {
@@ -275,11 +275,11 @@ public class CommonUtils {
     }
   }
 
-  public static Stream<Path> findFiles(final File root, final String name, final String ext) {
+  public static final Stream<Path> findFiles(final File root, final String name, final String ext) {
     return CommonUtils.findFiles(root, name + "." + ext);
   }
 
-  public static Stream<Path> findFiles(final File root, final Predicate<Path> test) {
+  public static final Stream<Path> findFiles(final File root, final Predicate<Path> test) {
     try {
       return Files.walk(root.toPath()).filter(test);
     } catch (final IOException e) {
@@ -287,26 +287,26 @@ public class CommonUtils {
     }
   }
 
-  public static Stream<Node> findChildren(
+  public static final Stream<Node> findChildren(
       final Node parent, final String tagName, final boolean deep) {
     final var test = (Predicate<Node>) node -> node.getNodeName().equals(tagName);
     return CommonUtils.findChildren(parent, test, deep);
   }
 
   /** ; for windows, : for unix */
-  public static String getPathSeparator() {
+  public static final String getPathSeparator() {
     return System.getProperty("os.name").toLowerCase().contains("windows") ? ";" : ":";
   }
 
   /** Tests if a directory exists and creates it if it doesn't */
-  public static void ensureDirectoryExists(final String dirName) {
+  public static final void ensureDirectoryExists(final String dirName) {
     final var dir = new File(dirName);
     if (!dir.exists()) {
       dir.mkdirs();
     }
   }
 
-  public static <T> T tee(final T value) {
+  public static final <T> T tee(final T value) {
     System.out.println(value);
     return value;
   }
