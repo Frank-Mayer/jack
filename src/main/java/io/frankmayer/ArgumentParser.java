@@ -4,12 +4,15 @@ import static io.frankmayer.Error.panic;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public final class ArgumentParser {
 
   private final Map<String, String> options = new HashMap<>();
+  private final Set<String> flags = new HashSet<>();
   private String command = null;
   private Optional<String[]> remainingArguments;
 
@@ -29,19 +32,33 @@ public final class ArgumentParser {
         continue;
       }
 
-      if (optionName == null) {
-        if (!arg.startsWith("--")) {
-          panic(String.format("Invalid option name '%s' at position %s", arg, i));
+      if (arg.startsWith("-")) {
+        if (optionName == null) {
+          optionName = arg.toLowerCase();
+        } else {
+          if (this.options.containsKey(optionName)) {
+            panic(String.format("Duplicate option flag: %s", optionName));
+          }
+          this.flags.add(optionName);
+          optionName = arg.toLowerCase();
         }
-        optionName = arg.substring(2).toLowerCase();
       } else {
+        if (optionName == null) {
+          panic(String.format("Unexpected argument: %s", arg));
+        }
+        if (this.options.containsKey(optionName)) {
+          panic(String.format("Duplicate option: %s", optionName));
+        }
         this.options.put(optionName, arg);
         optionName = null;
       }
     }
 
     if (optionName != null) {
-      panic(String.format("Missing value for option '%s'", optionName));
+      if (this.options.containsKey(optionName)) {
+        panic(String.format("Duplicate option flag: %s", optionName));
+      }
+      this.flags.add(optionName);
     }
 
     if (this.command == null) {
@@ -57,18 +74,29 @@ public final class ArgumentParser {
     return this.command;
   }
 
-  public final Optional<String> getOption(final String name) {
-    if (!this.options.containsKey(name)) {
-      return Optional.empty();
+  public final Optional<String> getOption(final String... name) {
+    Optional<String> result = Optional.empty();
+    for (final var n : name) {
+      if (this.options.containsKey(n)) {
+        if (result.isPresent()) {
+          panic(String.format("Duplicate option: %s", n));
+        }
+        result = Optional.of(this.options.get(n));
+      }
     }
-    return Optional.of(this.options.get(name));
+    return result;
   }
 
   public final Optional<String[]> getRemainingArguments() {
     return this.remainingArguments;
   }
 
-  public final boolean flag(String string) {
+  public final boolean flag(final String... string) {
+    for (final var s : string) {
+      if (this.flags.contains(s)) {
+        return true;
+      }
+    }
     return false;
   }
 }

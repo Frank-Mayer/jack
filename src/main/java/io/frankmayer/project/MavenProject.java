@@ -366,7 +366,7 @@ public final class MavenProject extends Project {
     mvnArgs.add("-f");
     mvnArgs.add(this.projectFile.toString());
     mvnArgs.add("compile");
-    if (Main.getArgs().getOption("verbose").isEmpty()) {
+    if (Main.getArgs().getOption("--verbose", "-v").isEmpty()) {
       mvnArgs.add("--quiet");
     }
     final var processBuilder = new ProcessBuilder(mvnArgs);
@@ -388,7 +388,7 @@ public final class MavenProject extends Project {
   public final void clean() {
     final var mvnArgs = new ArrayList<String>();
     mvnArgs.add("mvn");
-    if (!Main.getArgs().flag("verbose")) {
+    if (!Main.getArgs().flag("--verbose", "-v")) {
       mvnArgs.add("--quiet");
     }
     mvnArgs.add("-f");
@@ -417,7 +417,7 @@ public final class MavenProject extends Project {
     }
     final var mvnArgs = new ArrayList<String>();
     mvnArgs.add("mvn");
-    if (!Main.getArgs().flag("verbose")) {
+    if (!Main.getArgs().flag("--verbose", "-v")) {
       mvnArgs.add("--quiet");
     }
     mvnArgs.add("-f");
@@ -444,7 +444,7 @@ public final class MavenProject extends Project {
   public final void run(final String className) {
     final var mvnArgs = new ArrayList<String>();
     mvnArgs.add("mvn");
-    if (!Main.getArgs().flag("verbose")) {
+    if (!Main.getArgs().flag("--verbose", "-v")) {
       mvnArgs.add("--quiet");
     }
     mvnArgs.add("-f");
@@ -475,7 +475,7 @@ public final class MavenProject extends Project {
     }
     final var mvnArgs = new ArrayList<String>();
     mvnArgs.add("mvn");
-    if (!Main.getArgs().flag("verbose")) {
+    if (!Main.getArgs().flag("--verbose", "-v")) {
       mvnArgs.add("--quiet");
     }
     mvnArgs.add("-f");
@@ -503,7 +503,7 @@ public final class MavenProject extends Project {
   public final void run(final String className, final String[] args) {
     final var mvnArgs = new ArrayList<String>();
     mvnArgs.add("mvn");
-    if (!Main.getArgs().flag("verbose")) {
+    if (!Main.getArgs().flag("--verbose", "-v")) {
       mvnArgs.add("--quiet");
       mvnArgs.add("-f");
       mvnArgs.add(this.projectFile.toString());
@@ -562,7 +562,7 @@ public final class MavenProject extends Project {
       mvnArgs.add("compile");
       mvnArgs.add("-Dmaven.compiler.debug=true");
       mvnArgs.add("-Dmaven.compiler.debuglevel=source,lines");
-      if (!Main.getArgs().flag("verbose")) {
+      if (!Main.getArgs().flag("--verbose", "-v")) {
         mvnArgs.add("--quiet");
       }
 

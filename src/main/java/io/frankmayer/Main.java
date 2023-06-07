@@ -17,7 +17,7 @@ public final class Main {
 
     switch (Main.args.getCommand()) {
       case "init":
-        final var projectType = Main.args.getOption("type");
+        final var projectType = Main.args.getOption("--type", "-t");
         if (projectType.isEmpty()) {
           panic("Missing project type");
         }
@@ -46,7 +46,7 @@ public final class Main {
         if (projOpt.isEmpty()) {
           panic("No project found");
         }
-        final var entryPoint = Main.args.getOption("entry-point");
+        final var entryPoint = Main.args.getOption("--entry-point", "-ep");
         final var passArgs = Main.args.getRemainingArguments();
         if (entryPoint.isPresent()) {
           if (passArgs.isPresent()) {
@@ -66,7 +66,7 @@ public final class Main {
         if (projOpt.isEmpty()) {
           panic("No project found");
         }
-        final var debugEntryPoint = Main.args.getOption("entry-point");
+        final var debugEntryPoint = Main.args.getOption("--entry-point", "-ep");
         final var debugPassArgs = Main.args.getRemainingArguments();
         if (debugEntryPoint.isPresent()) {
           if (debugPassArgs.isPresent()) {
