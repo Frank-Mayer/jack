@@ -1,8 +1,8 @@
 #!/bin/bash
 
-N='\033[0;37m'
-R='\033[0;31m'
-B='\033[0;34m'
+N='\033[0m'
+R='\033[31m'
+B='\033[34m'
 echo -e "${N} ┌───────────────────────┐"
 echo -e "${N} │ J                     │"
 echo -e "${N} │ A                     │"
@@ -21,6 +21,7 @@ echo -e "${N} │                     Ɔ │"
 echo -e "${N} │                     Ɐ │"
 echo -e "${N} │                     ᒋ │"
 echo -e "${N} └───────────────────────┘"
+echo -e "${N}"
 
 command -v java >/dev/null 2>&1 || {
   echo "Java is not installed or not in your PATH. Jack depends on Java being installed."
@@ -107,32 +108,27 @@ esac
 }
 
 echo "Writing man pages"
-if [ ! -d /usr/local/share/man/man1/ ]; then
-  echo "Directory does not exist, creating it"
-  sudo mkdir -p /usr/local/share/man/man1/
-  sudo chmod -R 666 /usr/local/share/man/
-fi
-if test -f ./man/jack.1; then
-  cp man/* /usr/local/share/man/man1/ || {
-    echo "Failed to add man page"
-    exit 1
-  }
+function install_man_page {
+  if test -f ./man/jack.1; then
+    sudo cp man/* "$1" || {
+      echo "Failed to add man page"
+      exit 1
+    }
+  else
+    sudo curl -o "$1/jack.1" https://raw.githubusercontent.com/Frank-Mayer/jack/main/man/jack.1 || {
+      echo "Failed to add man page"
+      exit 1
+    }
+  fi
+  echo "Done"
+}
+if test -d /usr/local/share/man/man1; then
+  install_man_page "/usr/local/share/man/man1"
+elif test -d /usr/share/man/man1/; then
+  install_man_page "/usr/share/man/man1/"
 else
-  curl -o /usr/local/share/man/man1/jack.1 https://raw.githubusercontent.com/Frank-Mayer/jack/main/man/jack.1 || {
-    echo "Failed to add man page"
-    exit 1
-  }
+  echo "No target for man pages found"
 fi
-echo "Done"
 
 echo "Installation complete"
 
-command -v java >/dev/null 2>&1 || {
-  echo "Java is not installed or not in your PATH"
-  exit 1
-}
-command -v mvn >/dev/null 2>&1 || {
-  echo "Maven is not installed or not in your PATH"
-  ask_install maven
-  exit 1
-}
