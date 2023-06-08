@@ -122,9 +122,9 @@ function install_man_page {
   fi
   echo "Done"
 }
-if test -d /usr/local/share/man/man1; then
+if sudo test -d /usr/local/share/man/man1/; then
   install_man_page "/usr/local/share/man/man1"
-elif test -d /usr/share/man/man1/; then
+elif sudo test -d /usr/share/man/man1/; then
   install_man_page "/usr/share/man/man1/"
 else
   echo "No target for man pages found"
