@@ -32,9 +32,25 @@ command -v mvn >/dev/null 2>&1 || {
   exit 1
 }
 
-echo "Creating directory $HOME/.jack/bin"
-mkdir -p "$HOME/.jack/bin" || {
-  echo "Failed to create directory $HOME/.jack/bin"
+JACK_HOME="/opt/jack"
+BIN_DIR="$JACK_HOME/bin"
+
+echo "Creating directory $BIN_DIR"
+sudo mkdir -p "$BIN_DIR" || {
+  echo "Failed to create directory $BIN_DIR"
+  echo "Installation failed"
+  exit 1
+}
+echo "Done"
+
+echo "Setting permissions for directory $BIN_DIR"
+sudo chmod -R 755 "$BIN_DIR" || {
+  echo "Failed to set permissions for directory $BIN_DIR"
+  echo "Installation failed"
+  exit 1
+}
+sudo chown -R $(whoami) "$JACK_HOME" || {
+  echo "Failed to set permissions for directory $JACK_HOME"
   echo "Installation failed"
   exit 1
 }
@@ -42,7 +58,7 @@ echo "Done"
 
 if test -f ./pom.xml; then
   echo "Building jack from source"
-  if mvn clean package --quiet && mv target/jack.jar $HOME/.jack/bin/; then
+  if mvn clean package --quiet && mv target/jack.jar $BIN_DIR/; then
     echo "Done"
   else
       echo "Build failed"
@@ -50,7 +66,7 @@ if test -f ./pom.xml; then
       echo
       if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "Downloading latest release from GitHub"
-        curl -o $HOME/.jack/bin/jack.jar https://frank-mayer.github.io/jack/jack.jar || {
+        curl -o "$BIN_DIR/jack.jar" https://frank-mayer.github.io/jack/jack.jar || {
           echo "Failed to download latest release from GitHub"
           echo "Installation failed"
           exit 1
@@ -64,7 +80,7 @@ if test -f ./pom.xml; then
   fi
 else
   echo "Downloading latest release from GitHub"
-  curl -o $HOME/.jack/bin/jack.jar https://frank-mayer.github.io/jack/jack.jar || {
+  curl -o "$BIN_DIR/jack.jar" https://frank-mayer.github.io/jack/jack.jar || {
     echo "Failed to download latest release from GitHub"
     echo "Installation failed"
     exit 1
@@ -73,11 +89,9 @@ else
 fi
 
 echo "Creating wrapper script for jar file"
-cat << 'END_SCRIPT' > $HOME/.jack/bin/jack
-#!/bin/bash
-java -jar $HOME/.jack/bin/jack.jar "$@"
-END_SCRIPT
-chmod +x $HOME/.jack/bin/jack || {
+echo "#!/bin/bash" > "$BIN_DIR/jack"
+echo "java -jar $BIN_DIR/jack.jar \"\$@\"" >> "$BIN_DIR/jack"
+chmod +x $BIN_DIR/jack || {
   echo "Failed to create wrapper script"
   echo "Installation failed"
   exit 1
@@ -94,16 +108,16 @@ case "$SHELL" in
   */dash) rcfile="$HOME/.dashrc" ;;
 esac
 
-[[ $(which jack) == $HOME/.jack/bin/jack ]] || {
+[[ $(which jack) == "$BIN_DIR/jack" ]] || {
   echo "Jack is not in your PATH"
 
   read -p "Do you want to add jack to PATH in '$rcfile'? [y/N] " -n 1 -r
   echo
   if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "export PATH=\$PATH:$HOME/.jack/bin" >> "$rcfile"
+    echo "export PATH=$BIN_DIR:\$PATH" >> "$rcfile"
   else
     echo "You can add jack to your PATH manually by adding the following line to your rc file:"
-    echo "export PATH=\$PATH:$HOME/.jack/bin"
+    echo "export PATH=$BIN_DIR:\$PATH"
   fi
 }
 
