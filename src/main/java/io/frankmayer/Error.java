@@ -32,24 +32,6 @@ public final class Error {
 
   /** Format the given messages into a single string with a border around it. */
   private static final String prettyPrint(final String... messages) {
-    return Arrays.stream(messages)
-            .map(message -> RED + "■ " + message)
-            .map(
-                message ->
-                    Arrays.stream(message.split("\n")).collect(Collectors.joining("\n  " + RED)))
-            .collect(Collectors.joining("\n"))
-        + RESET;
+    return Arrays.stream(messages).collect(Collectors.joining("\n"));
   }
-
-  /** Color code for system terminal (Windows or Unix). */
-  private static final String RED =
-      System.getProperty("os.name").startsWith("Windows")
-          ? System.getenv("ESC") + "[31m"
-          : "\033[31m";
-
-  /** Color code for system terminal (Windows or Unix). */
-  private static final String RESET =
-      System.getProperty("os.name").startsWith("Windows")
-          ? System.getenv("ESC") + "[0m"
-          : "\033[0m";
 }
