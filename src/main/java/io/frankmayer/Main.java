@@ -4,7 +4,7 @@ import static io.frankmayer.Error.panic;
 
 import io.frankmayer.project.Project;
 
-public final class Main {
+public class Main {
   private static ArgumentParser args;
 
   public static final ArgumentParser getArgs() {

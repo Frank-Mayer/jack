@@ -7,32 +7,32 @@ import java.util.Optional;
 
 public abstract class Project {
 
-  protected final File projectFile;
-  protected final File projectRootPath;
+    protected File projectFile;
+    protected File projectRootPath;
 
-  public Project(final File projectFile) {
-    this.projectFile = projectFile;
-    this.projectRootPath = this.projectFile.getParentFile();
-  }
-
-  public static final void create(final String string) {
-    switch (string.toLowerCase()) {
-      case "maven":
-        MavenProject.create();
-        break;
-      case "gradle":
-        GradleProject.create();
-        break;
-      case "intellij":
-        IntelliJProject.create();
-        break;
-      default:
-        panic(String.format("Unknown project type: \"%s\"", string));
-        break;
+    public Project(final File projectFile) {
+        this.projectFile = projectFile;
+        this.projectRootPath = this.projectFile.getParentFile();
     }
-  }
 
-  public static final String getGitignore() {
+    public static void create(final String string) {
+        switch (string.toLowerCase()) {
+        case "maven":
+            MavenProject.create();
+            break;
+        case "gradle":
+            GradleProject.create();
+            break;
+        case "intellij":
+            IntelliJProject.create();
+            break;
+        default:
+            panic(String.format("Unknown project type: \"%s\"", string));
+            break;
+        }
+    }
+
+    public static String getGitignore() {
     return """
 # Compiled class file
 target/
@@ -98,37 +98,33 @@ build/
 ### Mac OS ###
 .DS_Store
         """;
-  }
+    }
 
-  public final File getRootPath() {
-    return this.projectRootPath;
-  }
+    public File getRootPath() { return this.projectRootPath; }
 
-  public final String getProjectFile() {
-    return this.projectFile.getPath();
-  }
+    public String getProjectFile() { return this.projectFile.getPath(); }
 
-  public abstract Optional<String> getDefaultClassName();
+    public abstract Optional<String> getDefaultClassName();
 
-  public abstract void build();
+    public abstract void build();
 
-  public abstract void clean();
+    public abstract void clean();
 
-  public abstract void run();
+    public abstract void run();
 
-  public abstract void run(final String className);
+    public abstract void run(final String className);
 
-  public abstract void run(final String[] args);
+    public abstract void run(final String[] args);
 
-  public abstract void run(final String className, final String[] args);
+    public abstract void run(final String className, final String[] args);
 
-  public abstract void debug();
+    public abstract void debug();
 
-  public abstract void debug(final String className);
+    public abstract void debug(final String className);
 
-  public abstract void debug(final String[] args);
+    public abstract void debug(final String[] args);
 
-  public abstract void debug(final String string, final String[] args);
+    public abstract void debug(final String string, final String[] args);
 
-  public abstract String getSourcePath();
+    public abstract String getSourcePath();
 }

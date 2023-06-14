@@ -26,12 +26,12 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-public final class MavenProject extends Project {
+public class MavenProject extends Project {
 
-  private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+  private static DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
   private static DocumentBuilder builder;
 
-  public static final void create() {
+  public static void create() {
     // check if pom.xml exists
     final var pomXmlFile = new File("pom.xml");
 
@@ -279,7 +279,7 @@ public final class MavenProject extends Project {
     System.out.println("Done");
   }
 
-  private static final void writeDocumentToFile(final Document doc, final File xmlFile) {
+  private static void writeDocumentToFile(final Document doc, final File xmlFile) {
     try {
       final var transformerFactory = TransformerFactory.newInstance();
       final var transformer = transformerFactory.newTransformer();
@@ -317,7 +317,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final Optional<String> getDefaultClassName() {
+  public Optional<String> getDefaultClassName() {
     // look for project.build.plugins.plugin
     // groupId = org.codehaus.mojo
     // and artifactId = exec-maven-plugin in this.document
@@ -360,7 +360,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final void build() {
+  public void build() {
     final var mvnArgs = new ArrayList<String>();
     mvnArgs.add("mvn");
     mvnArgs.add("-f");
@@ -385,7 +385,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final void clean() {
+  public void clean() {
     final var mvnArgs = new ArrayList<String>();
     mvnArgs.add("mvn");
     if (!Main.getArgs().flag("--verbose", "-v")) {
@@ -410,7 +410,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final void run() {
+  public void run() {
     final var entryPoint = this.getDefaultClassName();
     if (entryPoint.isEmpty()) {
       panic("No entry point found");
@@ -441,7 +441,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final void run(final String className) {
+  public void run(final String className) {
     final var mvnArgs = new ArrayList<String>();
     mvnArgs.add("mvn");
     if (!Main.getArgs().flag("--verbose", "-v")) {
@@ -468,7 +468,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final void run(final String[] args) {
+  public void run(final String[] args) {
     final var entryPoint = this.getDefaultClassName();
     if (entryPoint.isEmpty()) {
       panic("No entry point found");
@@ -500,7 +500,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final void run(final String className, final String[] args) {
+  public void run(final String className, final String[] args) {
     final var mvnArgs = new ArrayList<String>();
     mvnArgs.add("mvn");
     if (!Main.getArgs().flag("--verbose", "-v")) {
@@ -529,7 +529,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final void debug() {
+  public void debug() {
     final var defaultClassName = this.getDefaultClassName();
     if (!defaultClassName.isPresent()) {
       panic("No default class name found");
@@ -543,7 +543,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final void debug(final String[] args) {
+  public void debug(final String[] args) {
     final var defaultClassName = this.getDefaultClassName();
     if (!defaultClassName.isPresent()) {
       panic("No default class name found");
@@ -552,7 +552,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final void debug(final String className, final String[] args) {
+  public void debug(final String className, final String[] args) {
     try {
       final int jdbPort = JDB.getPort();
       final var mvnArgs = new ArrayList<String>();
@@ -613,7 +613,7 @@ public final class MavenProject extends Project {
   }
 
   @Override
-  public final String getSourcePath() {
+  public String getSourcePath() {
     // src/main/java
     final var joiner = new StringJoiner(File.separator);
     joiner.add("src");

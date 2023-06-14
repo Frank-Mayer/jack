@@ -5,7 +5,7 @@ import static io.frankmayer.Error.panic;
 import io.frankmayer.project.Project;
 import java.io.IOException;
 
-public final class JDB {
+public class JDB {
 
   public static final int getPort() {
     return 5005;

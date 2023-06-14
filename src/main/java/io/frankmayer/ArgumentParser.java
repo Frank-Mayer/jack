@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public final class ArgumentParser {
+public class ArgumentParser {
 
-  private final Map<String, String> options = new HashMap<>();
-  private final Set<String> flags = new HashSet<>();
+  private Map<String, String> options = new HashMap<>();
+  private Set<String> flags = new HashSet<>();
   private String command = null;
   private Optional<String[]> remainingArguments;
 
@@ -70,11 +70,11 @@ public final class ArgumentParser {
     }
   }
 
-  public final String getCommand() {
+  public String getCommand() {
     return this.command;
   }
 
-  public final Optional<String> getOption(final String... name) {
+  public Optional<String> getOption(final String... name) {
     Optional<String> result = Optional.empty();
     for (final var n : name) {
       if (this.options.containsKey(n)) {
@@ -87,11 +87,11 @@ public final class ArgumentParser {
     return result;
   }
 
-  public final Optional<String[]> getRemainingArguments() {
+  public Optional<String[]> getRemainingArguments() {
     return this.remainingArguments;
   }
 
-  public final boolean flag(final String... string) {
+  public boolean flag(final String... string) {
     for (final var s : string) {
       if (this.flags.contains(s)) {
         return true;

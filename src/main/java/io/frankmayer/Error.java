@@ -5,7 +5,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public final class Error {
+public class Error {
 
   private Error() {}
 

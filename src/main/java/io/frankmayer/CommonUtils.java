@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public final class CommonUtils {
+public class CommonUtils {
 
   private static final Scanner scanner = new Scanner(System.in);
   private static Optional<File> projectFileCache = Optional.empty();
