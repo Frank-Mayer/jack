@@ -112,5 +112,7 @@ public class Main {
       default:
         panic(String.format("Unknown command '%s'", Main.args.getCommand()));
     }
+
+    Main.args.checkUnused();
   }
 }

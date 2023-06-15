@@ -11,8 +11,10 @@ import java.util.Set;
 
 public class ArgumentParser {
 
-  private Map<String, String> options = new HashMap<>();
-  private Set<String> flags = new HashSet<>();
+  private final Map<String, String> options = new HashMap<>();
+  private final Set<String> unusedOptions = new HashSet<>();
+  private final Set<String> flags = new HashSet<>();
+  private final Set<String> unusedFlags = new HashSet<>();
   private String command = null;
   private Optional<String[]> remainingArguments;
 
@@ -68,6 +70,9 @@ public class ArgumentParser {
     if (this.remainingArguments == null) {
       this.remainingArguments = Optional.empty();
     }
+
+    this.unusedOptions.addAll(this.options.keySet());
+    this.unusedFlags.addAll(this.flags);
   }
 
   public String getCommand() {
@@ -82,6 +87,7 @@ public class ArgumentParser {
           panic(String.format("Duplicate option: %s", n));
         }
         result = Optional.of(this.options.get(n));
+        this.unusedOptions.remove(n);
       }
     }
     return result;
@@ -94,9 +100,19 @@ public class ArgumentParser {
   public boolean flag(final String... string) {
     for (final var s : string) {
       if (this.flags.contains(s)) {
+        this.unusedFlags.remove(s);
         return true;
       }
     }
     return false;
+  }
+
+  public void checkUnused() {
+    if (!this.unusedOptions.isEmpty()) {
+      System.err.println(String.format("Unused options: %s", this.unusedOptions));
+    }
+    if (!this.unusedFlags.isEmpty()) {
+      System.err.println(String.format("Unused flags: %s", this.unusedFlags));
+    }
   }
 }
