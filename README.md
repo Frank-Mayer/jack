@@ -12,7 +12,7 @@
 
 [![Deploy jar file to Pages](https://github.com/Frank-Mayer/jack/actions/workflows/deploy.yml/badge.svg)](https://github.com/Frank-Mayer/jack/actions/workflows/deploy.yml)
 
-![this product is ai free](https://this-product-is-ai-free.github.io/badge.svg)
+[![this product is ai free](https://this-product-is-ai-free.github.io/badge.svg)](https://this-product-is-ai-free.github.io)
 
 - Are you annoyed by all the different build tools and think "I just want to run this code quickly"?
 - Do you work with an editor like Vim and want to debug your Java code?
