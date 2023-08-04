@@ -37,7 +37,6 @@ in [this repos wiki](https://github.com/Frank-Mayer/jack/wiki).
 
 You can install them from the websites or using your package manager.
 
--
 java ([Oracle JDK](https://www.oracle.com/de/java/technologies/downloads/)/[OpenJDK](https://openjdk.org/)/[Amazon Corretto](https://aws.amazon.com/de/corretto/?filtered-posts.sort-by=item.additionalFields.createdDate&filtered-posts.sort-order=desc)/…)
 - [jdb](https://docs.oracle.com/en/java/javase/11/tools/jdb.html)
 - [maven](https://maven.apache.org/)
